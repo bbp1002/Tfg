@@ -1,4 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using TFG_Cultivos.Models;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+// Conexión a PostgreSQL
+builder.Services.AddDbContext<PacContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 
