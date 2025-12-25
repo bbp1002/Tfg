@@ -1,160 +1,165 @@
 ﻿using ClosedXML.Excel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TFG_Cultivos.Models;
+using TFG_Cultivos.Services.ExcelConversionService;
 
 namespace TFG_Cultivos.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class FarmController : Controller
     {
-        // GET: FarmController
-        public ActionResult Index()
+        private readonly PacContext _context;
+        private readonly IExcelConversionService _excelService;
+
+        public FarmController(PacContext context, IExcelConversionService excelService)
         {
-            return View();
+            _context = context;
+            _excelService = excelService;
         }
 
-        // GET: FarmController/Details/5
-        public ActionResult Details(int id)
+        [Route("getAll")]
+        [HttpGet]
+        public IActionResult GetAll()
         {
-            return View();
+            var parcelas = _context.Parcelas.ToList();
+            return Ok(parcelas);
         }
 
-        // GET: FarmController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
 
-        // POST: FarmController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        [HttpPost("importar-pac")]
+        public async Task<IActionResult> ImportarPacDesdeExcel(IFormFile archivoExcel)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            if (archivoExcel == null || archivoExcel.Length == 0)
+                return BadRequest("No se ha enviado ningún archivo.");
 
-        // GET: FarmController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            int usuarioId = 1;                 // luego JWT
+            int añoCampaña = DateTime.Now.Year;
 
-        // POST: FarmController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: FarmController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: FarmController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        [HttpPost("PostImportarParcelasExcel")]
-        public async Task<List<Parcelas>> PostImportarAcreedoresDesdeExcel(IFormFile archivoExcel)
-        {
-            var parcelas = new List<Parcelas>();
             var errores = new List<string>();
 
-            using (var stream = new MemoryStream())
+            using var stream = new MemoryStream();
+            await archivoExcel.CopyToAsync(stream);
+            stream.Position = 0;
+
+            var workbook = _excelService.ConvertToXlsx(archivoExcel);
+            var ws = workbook.Worksheet(1);
+
+            int fila = 14;
+
+            while (true)
             {
-                await archivoExcel.CopyToAsync(stream);
-                using (var workbook = new XLWorkbook(stream))
+                var row = ws.Row(fila);
+
+                
+                if (row.Cell(2).IsEmpty())
+                    break;
+
+                try
                 {
-                    var worksheet = workbook.Worksheet(1);
-                    var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
-                    int fila = 2;
-
-                    foreach (var row in rows)
+                    // Validaciones
+                    if (!row.Cell(7).TryGetValue<int>(out int poligono))
                     {
-                        try
-                        {
-                            string provinciaTexto = row.Cell(6).GetString().Trim();
-                            string poblacionTexto = row.Cell(7).GetString().Trim();
-
-                            int? provinciaId = await dataBase.Provincias
-                                .Where(x => x.Nombre == provinciaTexto)
-                                .Select(x => (int?)x.Id)
-                                .FirstOrDefaultAsync();
-
-                            int? poblacionId = await dataBase.Poblaciones
-                                .Where(x => x.Nombre == poblacionTexto)
-                                .Select(x => (int?)x.Id)
-                                .FirstOrDefaultAsync();
-
-                            if (provinciaId == null || poblacionId == null)
-                            {
-                                errores.Add($"Fila {fila}: Provincia o población no encontrada.");
-                                fila++;
-                                continue;
-                            }
-
-                            var parcela = new Parcelas
-                            {
-                                Nombre = row.Cell(1).GetString(),
-                                NombreComercial = row.Cell(2).GetString(),
-                                Nif = row.Cell(3).GetString(),
-                                Direccion = row.Cell(4).GetString(),
-                                CodigoPostal = row.Cell(5).GetString(),
-                                Telefono = row.Cell(8).GetString(),
-                                Email = row.Cell(9).GetString(),
-                                TipoFormaPagoId = 1,
-                                ProvinciaId = provinciaId,
-                                PoblacionId = poblacionId
-                            };
-
-                            parcelas.Add(parcela);
-                        }
-                        catch (Exception ex)
-                        {
-                            errores.Add($"Fila {fila}: Error al procesar - {ex.Message}");
-                        }
-
                         fila++;
+                        continue;
+                    }
+
+                    if (!row.Cell(8).TryGetValue<int>(out int parcelaNum))
+                    {
+                        fila++;
+                        continue;
+                    }
+
+                    // PARCELA
+                    var parcela = await _context.Parcelas
+                        .FirstOrDefaultAsync(p =>
+                            p.UsuarioId == usuarioId &&
+                            p.Poligono == poligono &&
+                            p.ParcelaNumero == parcelaNum);
+
+                    if (parcela == null)
+                    {
+                        parcela = new Parcelas
+                        {
+                            UsuarioId = usuarioId,
+                            CodigoProvincia = row.Cell(3).GetString().Trim(),
+                            Municipio = row.Cell(4).GetString().Trim(),
+                            CodigoAgregado = row.Cell(5).GetString().Trim(),
+                            Zona = row.Cell(6).GetString().Trim(),
+                            Poligono = poligono,
+                            ParcelaNumero = parcelaNum
+                        };
+
+                        _context.Parcelas.Add(parcela);
+                    }
+
+                        // RECINTO
+                        if (!row.Cell(9).TryGetValue<int>(out int recintoNum))
+                    {
+                        fila++;
+                        continue;
+                    }
+
+                    var recinto = await _context.Recintos
+                        .FirstOrDefaultAsync(r =>
+                            r.ParcelaId == parcela.Id &&
+                            r.IdRecinto == recintoNum);
+
+                    if (recinto == null)
+                    {
+                        recinto = new Recintos
+                        {
+                            Parcela = parcela,
+                            IdRecinto = recintoNum,
+                            UsoSigpac = row.Cell(10).GetString().Trim(),
+                            SuperficieSigpac = row.Cell(11).GetValue<decimal>()
+                        };
+
+                        _context.Recintos.Add(recinto);
+                    }
+
+                    //DATOS AGRONÓMICOS(HISTÓRICO)
+                    bool existeDato = await _context.DatoAgronomico.AnyAsync(d =>
+                         d.RecintoId == recinto.Id &&
+                         d.AñoCampaña == añoCampaña);
+
+                    if (!existeDato)
+                    {
+                        var dato = new DatoAgronomico
+                        {
+                            Recinto = recinto,
+                            AñoCampaña = añoCampaña,
+                            SuperficieCultivada = row.Cell(12).GetValue<decimal>(),
+                            EspecieVariedad = row.Cell(13).GetString().Trim(),
+                            EcoregimenPractica = row.Cell(14).GetString().Trim(),
+                            SecanoRegadio = row.Cell(15).GetString().Trim(),
+                            CultivoPrincipalSecundario = row.Cell(16).GetString().Trim(),
+                            FechaInicio = row.Cell(17).TryGetValue(out DateTime fi) ? fi : null,
+                            FechaFin = row.Cell(18).TryGetValue(out DateTime ff) ? ff : null,
+                            AireLibreProtegido = row.Cell(19).GetString().Trim()
+                        };
+
+                        _context.DatoAgronomico.Add(dato);
                     }
                 }
+
+                catch (Exception ex)
+                {
+                    errores.Add($"Fila {fila}: {ex.Message}");
+                }
+
+                fila++;
             }
 
-            if (errores.Any())
+            await _context.SaveChangesAsync();
+
+            return Ok(new
             {
-                // Log errors or handle them as needed
-                Console.WriteLine("Errores durante la importación:");
-                errores.ForEach(e => Console.WriteLine(e));
-            }
-
-            return parcelas;
+                Mensaje = "Importación PAC finalizada correctamente",
+                FilasProcesadas = fila - 2,
+                Errores = errores
+            });
         }
     }
 }

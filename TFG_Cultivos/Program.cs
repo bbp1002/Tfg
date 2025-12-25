@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using TFG_Cultivos.Models;
+using TFG_Cultivos.Services.ExcelConversionService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IExcelConversionService, ExcelConversionService>();
+
 
 // Conexión a PostgreSQL
 builder.Services.AddDbContext<PacContext>(options =>

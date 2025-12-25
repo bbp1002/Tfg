@@ -1,21 +1,34 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TFG_Cultivos.Models
 {
     [Table("parcelas")]
     public class Parcelas
     {
+        [Key]
         public int Id { get; set; }
-        public int Provincia { get; set; }
-        public string TerminoMunicipal { get; set; }
-        //public int Agregado { get; set; }
-        //public int Zona { get; set; }
+
+        // Multiusuario
+        public int UsuarioId { get; set; }
+
+        // SIGPAC
+        [MaxLength(10)]
+        public string CodigoProvincia { get; set; }
+
+        [MaxLength(100)]
+        public string Municipio { get; set; }
+
+        [MaxLength(10)]
+        public string CodigoAgregado { get; set; }
+
+        [MaxLength(10)]
+        public string Zona { get; set; }
+
         public int Poligono { get; set; }
-        public int Parcela { get; set; }
-        public int Recinto { get; set; }
-        //public string UsoSIGPAC { get; set; }
-        public double Superficie { get; set; }
-        public double SuperficieCultivada { get; set; }
-        //public bool Secano { get; set; }
+        public int ParcelaNumero { get; set; }
+
+        // Navegación
+        public ICollection<Recintos> Recintos { get; set; } = new List<Recintos>();
     }
 }
