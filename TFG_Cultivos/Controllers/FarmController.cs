@@ -1,6 +1,8 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TFG_Cultivos.Models;
 using TFG_Cultivos.Services.ExcelConversionService;
 
@@ -8,6 +10,7 @@ namespace TFG_Cultivos.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class FarmController : Controller
     {
         private readonly PacContext _context;
@@ -29,13 +32,13 @@ namespace TFG_Cultivos.Controllers
 
 
         [HttpPost("importar-pac")]
-        public async Task<IActionResult> ImportarPacDesdeExcel(IFormFile archivoExcel)
+        public async Task<IActionResult> ImportarPacDesdeExcel(IFormFile archivoExcel, int anio)
         {
             if (archivoExcel == null || archivoExcel.Length == 0)
                 return BadRequest("No se ha enviado ningún archivo.");
 
-            int usuarioId = 1;                 // luego JWT
-            int añoCampaña = DateTime.Now.Year;
+            int usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            int añoCampaña = anio;
 
             var errores = new List<string>();
 
