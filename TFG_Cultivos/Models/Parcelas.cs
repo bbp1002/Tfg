@@ -10,7 +10,7 @@ namespace TFG_Cultivos.Models
         public int Id { get; set; }
 
         // Multiusuario
-        public int UsuarioId { get; set; }
+        public string UsuarioId { get; set; }
 
         // SIGPAC
         [MaxLength(10)]

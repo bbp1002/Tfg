@@ -11,7 +11,7 @@ namespace TFG_Cultivos.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class FarmController : Controller
+    public class FarmController : ControllerBase
     {
         private readonly PacContext _context;
         private readonly IExcelConversionService _excelService;
@@ -32,29 +32,25 @@ namespace TFG_Cultivos.Controllers
 
 
         [HttpPost("importar-pac")]
-        public async Task<IActionResult> ImportarPacDesdeExcel(IFormFile archivoExcel, int anio)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ImportarPacDesdeExcel([FromForm] ImportPacRequest request)
         {
-            if (archivoExcel == null || archivoExcel.Length == 0)
+            if (request.ArchivoExcel == null || request.ArchivoExcel.Length == 0)
                 return BadRequest("No se ha enviado ningún archivo.");
 
-            int usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            int añoCampaña = anio;
+            string usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int añoCampaña = request.Anio;
 
             var errores = new List<string>();
 
-            using var stream = new MemoryStream();
-            await archivoExcel.CopyToAsync(stream);
-            stream.Position = 0;
-
-            var workbook = _excelService.ConvertToXlsx(archivoExcel);
-            var ws = workbook.Worksheet(1);
+            var workbook = _excelService.ConvertToXlsx(request.ArchivoExcel);
+            var ws = ObtenerHojaParcelas(workbook);
 
             int fila = 14;
 
             while (true)
             {
                 var row = ws.Row(fila);
-
                 
                 if (row.Cell(2).IsEmpty())
                     break;
@@ -95,6 +91,7 @@ namespace TFG_Cultivos.Controllers
                         };
 
                         _context.Parcelas.Add(parcela);
+                        await _context.SaveChangesAsync();
                     }
 
                         // RECINTO
@@ -120,6 +117,7 @@ namespace TFG_Cultivos.Controllers
                         };
 
                         _context.Recintos.Add(recinto);
+                        await _context.SaveChangesAsync();
                     }
 
                     //DATOS AGRONÓMICOS(HISTÓRICO)
@@ -164,5 +162,29 @@ namespace TFG_Cultivos.Controllers
                 Errores = errores
             });
         }
+
+        private IXLWorksheet? ObtenerHojaParcelas(XLWorkbook workbook)
+        {
+            foreach (var sheet in workbook.Worksheets)
+            {
+                // Busca textos típicos PAC en las primeras filas
+                for (int fila = 1; fila <= 20; fila++)
+                {
+                    var textoFila = sheet.Row(fila)
+                        .CellsUsed()
+                        .Select(c => c.GetString().ToUpperInvariant())
+                        .ToList();
+
+                    if (textoFila.Any(t => t.Contains("2.1 DATOS IDENTIFICATIVOS Y AGRONÓMICOS DE LAS PARCELAS"))
+                        )
+                    {
+                        return sheet;
+                    }
+                }
+            }
+
+            return null;
+        }
+
     }
 }
