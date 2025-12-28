@@ -358,5 +358,91 @@ namespace TFG_Cultivos.Controllers
                 totalRecintos = respuestaIa.Asignaciones.Count
             });
         }
+
+        [HttpGet("exportar-propuesta")]
+        public async Task<IActionResult> ExportarPropuestaExcel(
+    int anio,
+    bool soloBorrador = true)
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var propuestas = await _context.PropuestasCultivo
+                .Include(p => p.Recinto)
+                    .ThenInclude(r => r.Parcela)
+                .Where(p => p.UsuarioId == usuarioId &&
+                            p.AnioCampania == anio)
+                .ToListAsync();
+
+            if (!propuestas.Any())
+                return BadRequest("No hay propuestas para exportar.");
+
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Propuesta PAC");
+
+            // CABECERAS
+            ws.Cell(1, 1).Value = "Municipio";
+            ws.Cell(1, 2).Value = "Polígono";
+            ws.Cell(1, 3).Value = "Parcela";
+            ws.Cell(1, 4).Value = "Superficie (ha)";
+            ws.Cell(1, 5).Value = "Cultivo propuesto";
+            ws.Cell(1, 6).Value = "Justificación";
+
+            int fila = 2;
+
+            foreach (var p in propuestas)
+            {
+                // Limpieza de JSON
+                string justificacionLimpia= LimpiarJustificacion(p.Justificacion);
+
+                ws.Cell(fila, 1).Value = p.Recinto.Parcela.Municipio;
+                ws.Cell(fila, 2).Value = p.Recinto.Parcela.Poligono;
+                ws.Cell(fila, 3).Value = p.Recinto.Parcela.ParcelaNumero;
+                ws.Cell(fila, 4).Value = p.Recinto.SuperficieSigpac;
+                ws.Cell(fila, 5).Value = p.CultivoPropuesto;
+                ws.Cell(fila, 6).Value = justificacionLimpia;
+
+                fila++;
+            }
+
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"propuesta_pac_{anio}.xlsx"
+            );
+        }
+
+        private static string LimpiarJustificacion(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return string.Empty;
+
+            try
+            {
+                // Caso A: string JSON
+                if (raw.TrimStart().StartsWith("\""))
+                    return JsonSerializer.Deserialize<string>(raw);
+
+                // Caso B: objeto JSON
+                if (raw.TrimStart().StartsWith("{"))
+                {
+                    using var doc = JsonDocument.Parse(raw);
+                    return string.Join(" | ",
+                        doc.RootElement.EnumerateObject()
+                            .Select(p => p.Value.GetString())
+                            .Where(v => !string.IsNullOrWhiteSpace(v))
+                    );
+                }
+            }
+            catch
+            {
+            }
+            return raw;
+        }
     }
 }
