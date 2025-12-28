@@ -13,5 +13,7 @@ namespace TFG_Cultivos.Models
         public DbSet<Parcelas> Parcelas { get; set; }
         public DbSet<Recintos> Recintos { get; set; }
         public DbSet<DatoAgronomico> DatoAgronomico { get; set; }
+        public DbSet<PropuestaCultivo> PropuestasCultivo { get; set; }
+
     }
 }

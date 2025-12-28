@@ -2,9 +2,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using TFG_Cultivos.Models;
+using TFG_Cultivos.Services;
 using TFG_Cultivos.Services.ExcelConversionService;
+using static TFG_Cultivos.Models.GeminiResponseDTO;
 
 namespace TFG_Cultivos.Controllers
 {
@@ -15,11 +22,15 @@ namespace TFG_Cultivos.Controllers
     {
         private readonly PacContext _context;
         private readonly IExcelConversionService _excelService;
+        private readonly IConfiguration _config;
+        private readonly string _apiKey;
 
-        public FarmController(PacContext context, IExcelConversionService excelService)
+        public FarmController(PacContext context, IExcelConversionService excelService, IConfiguration config)
         {
             _context = context;
             _excelService = excelService;
+            _config = config;
+            _apiKey = _config["apiKeyGemini"];
         }
 
         [Route("getAll")]
@@ -51,7 +62,7 @@ namespace TFG_Cultivos.Controllers
             while (true)
             {
                 var row = ws.Row(fila);
-                
+
                 if (row.Cell(2).IsEmpty())
                     break;
 
@@ -94,8 +105,8 @@ namespace TFG_Cultivos.Controllers
                         await _context.SaveChangesAsync();
                     }
 
-                        // RECINTO
-                        if (!row.Cell(9).TryGetValue<int>(out int recintoNum))
+                    // RECINTO
+                    if (!row.Cell(9).TryGetValue<int>(out int recintoNum))
                     {
                         fila++;
                         continue;
@@ -186,5 +197,166 @@ namespace TFG_Cultivos.Controllers
             return null;
         }
 
+        [HttpPost("generar-propuesta-ia")]
+        public async Task<IActionResult> GenerarPropuestaIa(int anioObjetivo)
+        {
+            string usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            int[] campanias = { anioObjetivo - 1, anioObjetivo - 2, anioObjetivo - 3 };
+
+            // 1️ Cargar explotación
+            var recintos = await _context.Recintos
+                .Include(r => r.Parcela)
+                .Include(r => r.DatosAgronomicos)
+                .Where(r => r.Parcela.UsuarioId == usuarioId)
+                .ToListAsync();
+
+            var cultivosDisponibles = new[] { "Trigo Blando", "Cebada", "Girasol", "Lentejas", "Barbecho" };
+
+            if (!recintos.Any())
+                return BadRequest("El usuario no tiene recintos cargados.");
+
+            // 2️ Construir JSON para IA
+            var recintosIa = recintos.Select(r => new
+            {
+                recintoId = r.Id,
+                superficie = r.SuperficieSigpac,
+                historial = r.DatosAgronomicos
+                    .Where(d => campanias.Contains(d.AñoCampaña))
+                    .OrderByDescending(d => d.AñoCampaña)
+                    .Select(d => new
+                    {
+                        anio = d.AñoCampaña,
+                        cultivo = d.EspecieVariedad
+                    })
+                    .ToList()
+            });
+
+            var superficieTotal = recintos.Sum(r => r.SuperficieSigpac);
+
+            var payloadIa = new
+            {
+                campaniaObjetivo = anioObjetivo,
+                cultivosPermitidos = cultivosDisponibles,
+                superficieTotal,
+                criteriosPAC = new
+                {
+                    rotacion = true,
+                    diversificacion = true,
+                    leguminosasMin = 10
+                },
+                recintos = recintosIa
+            };
+            string payloadJson = JsonSerializer.Serialize(payloadIa);
+
+            // 3️ Llamada única a Gemini
+            var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(180);
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}");
+            string systemInstructions = Constants.systemInstructions;
+            var parts = new List<object>();
+
+            var serializerOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false
+            };
+
+            var requestBody = new
+            {
+                contents = new[]
+    {
+        new
+        {
+            role = "user",
+            parts = new[]
+            {
+                new { text = $"INSTRUCCIONES CLAVE:\n{Constants.systemInstructions}" },
+                new { text = $"DATOS DE LA EXPLOTACIÓN:\n{payloadJson}" }
+            }
+        }
+    },
+                generationConfig = new
+                {
+                    temperature = 0.1
+
+                }
+            };
+            // 2. Serializamos de forma que C# NO toque las minúsculas/mayúsculas
+            var options = new JsonSerializerOptions { PropertyNamingPolicy = null };
+            string finalJson = JsonSerializer.Serialize(requestBody, options);
+
+            var content = new StringContent(finalJson, Encoding.UTF8, "application/json");
+
+            request.Content = content;
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    return StatusCode((int)response.StatusCode, errorBody);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(500, $"Error llamando a IA: {ex.Message}");
+            }
+            var rawJson = await response.Content.ReadAsStringAsync();
+
+            // 4️ Procesar respuesta IA
+            PropuestaIaDto respuestaIa;
+
+            try
+            {
+                var jsonResponse = JsonNode.Parse(rawJson);
+                string text = jsonResponse["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.GetValue<string>();
+
+                string cleanedJson = text
+                    .Replace("```json", "")
+                    .Replace("```", "")
+                    .Trim();
+
+                respuestaIa = JsonSerializer.Deserialize<PropuestaIaDto>(cleanedJson)!;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error parseando IA: {ex.Message}");
+            }
+
+            // 5️ Guardar BORRADOR
+            foreach (var r in respuestaIa.Asignaciones)
+            {
+                if (!int.TryParse(r.ParcelaId, out int recintoId))
+                    continue;
+                _context.PropuestasCultivo.Add(new PropuestaCultivo
+                {
+                    UsuarioId = usuarioId,
+                    RecintoId = recintoId,
+                    AnioCampania = anioObjetivo,
+                    CultivoPropuesto = r.CultivoRecomendado,
+                    Justificacion = JsonSerializer.Serialize(new
+                    {
+                        pac = r.JustificacionPac,
+                        agronomico = r.BeneficioAgronomico
+                    }),
+                    EsBorrador = true
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                mensaje = "Propuesta IA generada y guardada como borrador",
+                anio = anioObjetivo,
+                cumplePac = respuestaIa.ResumenExplotacion.CumplePac,
+                porcentajeMejorantes = respuestaIa.ResumenExplotacion.PorcentajeMejorantes,
+                totalRecintos = respuestaIa.Asignaciones.Count
+            });
+        }
     }
 }
