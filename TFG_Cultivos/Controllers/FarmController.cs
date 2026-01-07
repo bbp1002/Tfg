@@ -198,11 +198,14 @@ namespace TFG_Cultivos.Controllers
         }
 
         [HttpPost("generar-propuesta-ia")]
-        public async Task<IActionResult> GenerarPropuestaIa(int anioObjetivo)
+        public async Task<IActionResult> GenerarPropuestaIa(GenerarPropuestaRequest elecciones)
         {
             string usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            int[] campanias = { anioObjetivo - 1, anioObjetivo - 2, anioObjetivo - 3 };
+            int[] campanias = { elecciones.AnioCampania - 1, elecciones.AnioCampania - 2, elecciones.AnioCampania - 3 };
+
+            if (elecciones.CultivosPermitidos == null || !elecciones.CultivosPermitidos.Any())
+                return BadRequest("Debe seleccionar al menos un cultivo permitido.");
 
             // 1️ Cargar explotación
             var recintos = await _context.Recintos
@@ -210,8 +213,6 @@ namespace TFG_Cultivos.Controllers
                 .Include(r => r.DatosAgronomicos)
                 .Where(r => r.Parcela.UsuarioId == usuarioId)
                 .ToListAsync();
-
-            var cultivosDisponibles = new[] { "Trigo Blando", "Cebada", "Girasol", "Lentejas", "Barbecho" };
 
             if (!recintos.Any())
                 return BadRequest("El usuario no tiene recintos cargados.");
@@ -236,8 +237,9 @@ namespace TFG_Cultivos.Controllers
 
             var payloadIa = new
             {
-                campaniaObjetivo = anioObjetivo,
-                cultivosPermitidos = cultivosDisponibles,
+                campaniaObjetivo = elecciones.AnioCampania,
+                cultivosPermitidos = elecciones.CultivosPermitidos,
+                ecorregimenesSolicitados = elecciones.EcorregimenesObjetivo,
                 superficieTotal,
                 criteriosPAC = new
                 {
@@ -271,7 +273,7 @@ namespace TFG_Cultivos.Controllers
             role = "user",
             parts = new[]
             {
-                new { text = $"INSTRUCCIONES CLAVE:\n{Constants.systemInstructions}" },
+                new { text = $"INSTRUCCIONES CLAVE:\n{Constants.systemInstructions2}" },
                 new { text = $"DATOS DE LA EXPLOTACIÓN:\n{payloadJson}" }
             }
         }
@@ -336,7 +338,7 @@ namespace TFG_Cultivos.Controllers
                 {
                     UsuarioId = usuarioId,
                     RecintoId = recintoId,
-                    AnioCampania = anioObjetivo,
+                    AnioCampania = elecciones.AnioCampania,
                     CultivoPropuesto = r.CultivoRecomendado,
                     Justificacion = JsonSerializer.Serialize(new
                     {
@@ -352,7 +354,7 @@ namespace TFG_Cultivos.Controllers
             return Ok(new
             {
                 mensaje = "Propuesta IA generada y guardada como borrador",
-                anio = anioObjetivo,
+                anio = elecciones.AnioCampania,
                 cumplePac = respuestaIa.ResumenExplotacion.CumplePac,
                 porcentajeMejorantes = respuestaIa.ResumenExplotacion.PorcentajeMejorantes,
                 totalRecintos = respuestaIa.Asignaciones.Count
@@ -443,6 +445,7 @@ namespace TFG_Cultivos.Controllers
                 Nombre = parcela.NombrePersonalizado
             });
         }
+
         private static string LimpiarJustificacion(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw))
