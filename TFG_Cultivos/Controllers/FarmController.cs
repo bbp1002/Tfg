@@ -417,6 +417,32 @@ namespace TFG_Cultivos.Controllers
             );
         }
 
+
+        [HttpPut("asignar-nombre")]
+        public async Task<IActionResult> AsignarNombreParcela(int parcelaId, string nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+                return BadRequest("El nombre no puede estar vacío.");
+
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var parcela = await _context.Parcelas
+                .FirstOrDefaultAsync(p => p.Id == parcelaId && p.UsuarioId == usuarioId);
+
+            if (parcela == null)
+                return NotFound("Parcela no encontrada.");
+
+            parcela.NombrePersonalizado = nombre;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                Mensaje = "Nombre de parcela actualizado",
+                ParcelaId = parcelaId,
+                Nombre = parcela.NombrePersonalizado
+            });
+        }
         private static string LimpiarJustificacion(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw))

@@ -27,6 +27,7 @@ namespace TFG_Cultivos.Models
 
         public int Poligono { get; set; }
         public int ParcelaNumero { get; set; }
+        public string? NombrePersonalizado { get; set; }
 
         // Navegación
         public ICollection<Recintos> Recintos { get; set; } = new List<Recintos>();
