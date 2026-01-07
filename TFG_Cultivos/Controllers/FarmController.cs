@@ -362,9 +362,7 @@ namespace TFG_Cultivos.Controllers
         }
 
         [HttpGet("exportar-propuesta")]
-        public async Task<IActionResult> ExportarPropuestaExcel(
-    int anio,
-    bool soloBorrador = true)
+        public async Task<IActionResult> ExportarPropuestaExcel(int anio, bool soloBorrador = true)
         {
             var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -385,9 +383,11 @@ namespace TFG_Cultivos.Controllers
             ws.Cell(1, 1).Value = "Municipio";
             ws.Cell(1, 2).Value = "Polígono";
             ws.Cell(1, 3).Value = "Parcela";
-            ws.Cell(1, 4).Value = "Superficie (ha)";
-            ws.Cell(1, 5).Value = "Cultivo propuesto";
-            ws.Cell(1, 6).Value = "Justificación";
+            ws.Cell(1, 4).Value = "Recinto";
+            ws.Cell(1, 5).Value = "Superficie (ha)";
+            ws.Cell(1, 6).Value = "Nombre";
+            ws.Cell(1, 7).Value = "Cultivo propuesto";
+            ws.Cell(1, 8).Value = "Justificación";
 
             int fila = 2;
 
@@ -399,9 +399,11 @@ namespace TFG_Cultivos.Controllers
                 ws.Cell(fila, 1).Value = p.Recinto.Parcela.Municipio;
                 ws.Cell(fila, 2).Value = p.Recinto.Parcela.Poligono;
                 ws.Cell(fila, 3).Value = p.Recinto.Parcela.ParcelaNumero;
-                ws.Cell(fila, 4).Value = p.Recinto.SuperficieSigpac;
-                ws.Cell(fila, 5).Value = p.CultivoPropuesto;
-                ws.Cell(fila, 6).Value = justificacionLimpia;
+                ws.Cell(fila, 4).Value = p.Recinto.IdRecinto;
+                ws.Cell(fila, 5).Value = p.Recinto.SuperficieSigpac;
+                ws.Cell(fila, 6).Value = p.Recinto.Parcela.NombrePersonalizado;
+                ws.Cell(fila, 7).Value = p.CultivoPropuesto;
+                ws.Cell(fila, 8).Value = justificacionLimpia;
 
                 fila++;
             }
