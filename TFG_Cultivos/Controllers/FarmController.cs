@@ -419,6 +419,32 @@ namespace TFG_Cultivos.Controllers
             );
         }
 
+        [HttpGet("ver-en-sigpac")]
+        public async Task<IActionResult> VerEnSigpac(int id)
+        {
+            var parcela = await _context.Parcelas
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            var queryParams = new Dictionary<string, string?>
+            {
+                ["provincia"] = parcela.CodigoProvincia,
+                ["municipio"] = parcela.Municipio,
+                ["agregado"] = parcela.CodigoAgregado ?? "0",
+                ["zona"] = parcela.Zona ?? "0",
+                ["poligono"] = parcela.Poligono.ToString(),
+                ["parcela"] = parcela.ParcelaNumero.ToString(),
+            };
+
+            var queryString = string.Join("&",
+                queryParams
+                    .Where(p => !string.IsNullOrWhiteSpace(p.Value))
+                    .Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}")
+            );
+
+            var urlFinal = $"{Constants.SIGPAC_VISOR_URL}/?{queryString}";
+
+            return Ok(new { visorUrl = urlFinal });
+        }
 
         [HttpPut("asignar-nombre")]
         public async Task<IActionResult> AsignarNombreParcela(int parcelaId, string nombre)

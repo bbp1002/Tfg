@@ -54,5 +54,6 @@ No añadas texto fuera del JSON.
 No utilices saltos de línea innecesarios.
 No utilices caracteres escapados.
 ";
+        public const string SIGPAC_VISOR_URL = "https://sigpac.mapama.gob.es/fega/visor";
     }
 }
