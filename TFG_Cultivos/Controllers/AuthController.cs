@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -38,8 +39,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(string email, string password)
+    public async Task<IActionResult> Login([FromBody] Models.LoginRequest request)
     {
+        var email = request.Email; 
+        var password = request.Password;
         var user = await _userManager.FindByEmailAsync(email);
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
