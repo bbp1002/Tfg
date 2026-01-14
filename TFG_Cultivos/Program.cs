@@ -14,6 +14,18 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<PacContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddCors(options => 
+{ 
+    options.AddPolicy("AllowFrontend", 
+        policy => 
+        { 
+            policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        });
+});
+
 builder.Services
     .AddAuthentication(options =>
     {
@@ -85,6 +97,8 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 
