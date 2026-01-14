@@ -1,0 +1,114 @@
+\capitulo{5}{Aspectos relevantes del desarrollo del proyecto}
+
+En este capítulo se analizan los aspectos más relevantes que han condicionado el desarrollo del proyecto, así como las decisiones de diseño adoptadas y los principales retos encontrados durante su implementación. El objetivo es justificar las elecciones realizadas y poner en valor el proceso seguido, más allá del resultado final.
+
+{\imagen}{
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=\textwidth]{img/arquitectura_sistema.jpg}
+		\caption{Arquitectura general del sistema propuesto}\label{fig:#1}
+	\end{figure}
+	\FloatBarrier
+}
+
+\section{Enfoque centrado en el usuario}
+
+Uno de los aspectos más importantes del proyecto ha sido el enfoque centrado en el usuario final, en este caso el agricultor. Desde el inicio se ha tenido en cuenta que los usuarios del sistema no necesariamente poseen conocimientos técnicos avanzados, por lo que la aplicación debía ser intuitiva, clara y orientada a facilitar tareas que tradicionalmente se realizan de forma manual.
+
+Este enfoque ha influido directamente en decisiones como el uso de formatos conocidos (por ejemplo, hojas de cálculo), la posibilidad de asignar nombres personalizados a las parcelas o la generación de propuestas de cultivo en formato borrador, permitiendo al agricultor revisarlas antes de su aplicación definitiva.
+
+\section{Gestión de información compleja}
+La gestión de la información asociada a la PAC implica trabajar con un volumen considerable de datos y con múltiples relaciones entre ellos. Parcelas, recintos, campañas agrícolas y cultivos históricos forman un conjunto de información que debe mantenerse coherente y accesible.
+
+Uno de los retos principales ha sido estructurar estos datos de forma que permitieran su consulta y procesamiento eficiente, sin perder claridad ni consistencia. Para ello, se ha optado por un modelo de datos bien definido que permite reflejar fielmente la realidad de una explotación agrícola.
+
+\section{Cumplimiento normativo}
+El cumplimiento de la normativa de la Política Agraria Común ha sido un eje central del proyecto. Las condiciones establecidas por la PAC, como las BCAM o los ecorregímenes, introducen restricciones y porcentajes que afectan al conjunto de la explotación, no solo a parcelas individuales.
+
+Esto ha supuesto la necesidad de analizar la explotación como un todo, teniendo en cuenta la superficie total y la distribución de cultivos. Este enfoque global ha influido en el diseño del sistema y en la forma de generar las propuestas de cultivo.
+
+\section{Integración de inteligencia artificial}
+La incorporación de inteligencia artificial ha supuesto uno de los aspectos más innovadores del proyecto. En lugar de utilizar la IA como un elemento aislado, se ha integrado como una herramienta de apoyo a la toma de decisiones.
+
+La IA analiza los datos históricos de cultivos y los criterios normativos para generar propuestas coherentes, ayudando a reducir la complejidad del proceso. No obstante, el sistema se ha diseñado para que la decisión final siempre recaiga en el agricultor, manteniendo así el control humano sobre el resultado.
+
+El proceso de generación de propuestas de cultivo se ha diseñado como un flujo secuencial bien definido, con el objetivo de centralizar en una única operación todos los cálculos y validaciones necesarias. Tal y como se detalla en la Tabla~\ref{tab:fases_propuesta}, el sistema recopila tanto la información introducida por el usuario como los datos históricos almacenados, construyendo un prompt estructurado que permite al modelo de inteligencia artificial generar una propuesta coherente a nivel de explotación completa. Este enfoque permite evaluar correctamente criterios porcentuales exigidos por la PAC y garantiza la trazabilidad del proceso.
+
+\begin{table}[h]
+\centering
+\caption{Fases del proceso de generación de propuestas de cultivo}
+\label{tab:fases_propuesta}
+\begin{tabular}{|c|p{4cm}|p{7cm}|}
+\hline
+\textbf{Fase} & \textbf{Elemento} & \textbf{Descripción} \\ \hline
+1 & Selección de parámetros & El usuario define el año de campaña, los cultivos deseados y los ecorregímenes objetivo. \\ \hline
+2 & Recuperación de datos & El sistema obtiene las parcelas y el histórico de cultivos almacenados en la base de datos. \\ \hline
+3 & Construcción del prompt & Se genera un prompt estructurado en formato JSON con toda la información relevante. \\ \hline
+4 & Llamada a la IA & Se realiza una única llamada al modelo Google Gemini para toda la explotación. \\ \hline
+5 & Validación PAC & Se comprueba el cumplimiento de criterios BCAM y ecorregímenes seleccionados. \\ \hline
+6 & Almacenamiento & La propuesta se guarda en la base de datos en estado de borrador. \\ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Flexibilidad y personalización}
+Otro aspecto relevante del desarrollo ha sido la necesidad de ofrecer flexibilidad al usuario. El sistema permite seleccionar los ecorregímenes a los que se desea optar, así como definir una lista de cultivos permitidos, adaptándose así a las preferencias y circunstancias de cada explotación.
+
+Esta capacidad de personalización resulta fundamental en un entorno tan variable como el agrícola, donde las decisiones dependen de factores económicos, climáticos y personales.
+
+\section{Interoperabilidad con herramientas externas}
+La interoperabilidad ha sido un factor clave en el diseño del sistema. La integración con el visor SIGPAC mediante enlaces directos permite al agricultor consultar visualmente sus parcelas sin necesidad de introducir manualmente referencias adicionales.
+
+Asimismo, la importación y exportación de datos en formatos estándar facilita la integración del sistema con los procedimientos administrativos habituales del sector.
+
+\section{Seguridad y protección de datos}
+El sistema gestiona información sensible relacionada con explotaciones agrícolas, por lo que la seguridad ha sido un aspecto prioritario. Se han incorporado mecanismos de autenticación y control de acceso que garantizan que cada usuario solo pueda acceder a su propia información.
+
+Este enfoque refuerza la confianza del usuario en la aplicación y asegura un uso responsable del sistema.
+
+\section{Desarrollo de un frontend sencillo}
+Aunque el núcleo del proyecto se ha desarrollado como una API REST en ASP.NET Core, se ha implementado adicionalmente un frontend web sencillo con el objetivo de facilitar la interacción del usuario final con el sistema.
+
+Este frontend permite:
+\begin{itemize}
+    \item Autenticarse en la aplicación.
+    \item Consultar parcelas y recintos de la explotación.
+    \item Visualizar el histórico de cultivos por campaña.
+    \item Generar propuestas de cultivo mediante inteligencia artificial.
+    \item Exportar dichas propuestas en formato Excel.
+    \item Acceder directamente al visor SIGPAC para identificar parcelas.
+\end{itemize}
+
+La inclusión de este frontend ha permitido validar que la aplicación no solo es funcional a nivel técnico, sino también usable desde el punto de vista del agricultor, que normalmente no tiene conocimientos informáticos avanzados.
+
+\section{Entrevistas con agricultores}
+
+Durante el desarrollo del proyecto se han mantenido conversaciones y entrevistas informales con varios agricultores\cite{agricultores2025}, entre ellos familiares directos del autor, con el objetivo de conocer de primera mano las dificultades reales a las que se enfrentan durante la gestión de la PAC.
+
+De estas entrevistas se desprenden problemas recurrentes como:
+\begin{itemize}
+    \item La necesidad de consultar numerosos documentos en papel de campañas anteriores.
+    \item La dificultad para localizar rápidamente el historial de cultivos de una parcela concreta.
+    \item La falta de identificación clara de las parcelas, lo que obliga a buscarlas una por una en el visor SIGPAC.
+    \item El tiempo invertido en comprobar manualmente el cumplimiento de los requisitos de la PAC.
+\end{itemize}
+La aplicación desarrollada aborda directamente estas problemáticas, centralizando la información en una única plataforma digital y automatizando procesos que tradicionalmente se realizan de forma manual.
+
+\section{Entrevista con técnica agrónoma}
+
+Además de los agricultores, se ha realizado una entrevista con una técnica agrónoma\cite{ingenieraAgronoma} perteneciente a una empresa del sector, lo que ha permitido obtener una visión más profesional y técnica del problema.
+
+Desde este punto de vista, se ha valorado especialmente:
+\begin{itemize}
+    \item La utilidad de disponer de un histórico digitalizado de cultivos por parcela.
+    \item La generación automática de propuestas teniendo en cuenta criterios de la PAC.
+    \item La posibilidad de trabajar con propuestas en estado de borrador antes de su declaración definitiva.
+\end{itemize}
+Asimismo, se han identificado posibles líneas de mejora, como:
+\begin{itemize}
+    \item Introducir más criterios técnicos en la generación de propuestas.
+    \item Ampliar la base de conocimientos agronómicos de la inteligencia artificial.
+    \item Mejorar la visualización de datos en el frontend.
+\end{itemize}
+Estas aportaciones han servido para reforzar la validez del proyecto y para definir futuras ampliaciones del sistema.
+

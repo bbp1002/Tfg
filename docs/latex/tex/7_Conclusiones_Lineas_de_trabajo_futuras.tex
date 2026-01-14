@@ -1,0 +1,34 @@
+\capitulo{7}{Conclusiones y Líneas de trabajo futuras}
+
+\section{Conclusiones}
+A lo largo de este Trabajo Fin de Grado se ha desarrollado una aplicación software orientada a la gestión de explotaciones agrícolas y a la planificación de cultivos, con especial atención al cumplimiento de la normativa establecida por la Política Agraria Común (PAC). El proyecto surge como respuesta a una problemática real detectada en el entorno agrícola cercano, donde la gestión de la información se realiza, en muchos casos, de forma manual, dispersa y apoyada en múltiples fuentes no integradas.
+
+El principal objetivo del proyecto, consistente en centralizar la información de parcelas, recintos e histórico de cultivos y facilitar la generación de propuestas de siembra para campañas futuras, se ha cumplido de forma satisfactoria. La aplicación desarrollada permite importar datos oficiales de la PAC desde ficheros Excel, estructurarlos adecuadamente en una base de datos y reutilizarlos para distintos fines, evitando así la duplicación de información y reduciendo el riesgo de errores humanos.
+
+Uno de los aspectos más relevantes del trabajo es la integración de técnicas de inteligencia artificial para la generación de propuestas de cultivo. A través de una única llamada a un modelo de IA, el sistema es capaz de analizar el historial agronómico de la explotación, la superficie total y los criterios normativos seleccionados por el usuario, generando recomendaciones coherentes y justificadas desde el punto de vista agronómico y administrativo. Este enfoque demuestra el potencial de la inteligencia artificial como herramienta de apoyo a la toma de decisiones en el sector agrícola, especialmente en un contexto normativo cada vez más complejo.
+
+Asimismo, el sistema contempla el cumplimiento de distintos requisitos de la PAC, como las Buenas Condiciones Agrarias y Medioambientales (BCAM) y los ecorregímenes, permitiendo al usuario seleccionar aquellos a los que desea acogerse. Esto aporta flexibilidad a la aplicación y la hace adaptable a diferentes tipologías de explotación y estrategias productivas.
+
+Desde el punto de vista técnico, el uso de una arquitectura basada en una API REST desarrollada con ASP.NET Core, junto con Entity Framework Core y una base de datos relacional, ha permitido construir un sistema modular, escalable y mantenible. La incorporación de mecanismos de autenticación mediante JWT garantiza la seguridad y el aislamiento de los datos de cada usuario, un aspecto fundamental cuando se trabaja con información sensible de carácter económico y administrativo.
+
+Por último, el desarrollo de un frontend sencillo y la posibilidad de exportar la información a formatos estándar como Excel contribuyen a mejorar la usabilidad del sistema y facilitan su adopción por parte de usuarios con distintos niveles de competencia digital. Las valoraciones recogidas en entrevistas informales con agricultores y una técnica agrónoma ponen de manifiesto el interés práctico de la herramienta y su potencial para reducir significativamente el tiempo dedicado a tareas administrativas.
+
+En conjunto, el proyecto demuestra que la digitalización y la aplicación de tecnologías web e inteligencia artificial pueden aportar un valor real y tangible al sector agrícola, contribuyendo a una gestión más eficiente, sostenible y alineada con la normativa vigente.
+
+\section{Líneas de trabajo futuras}
+
+A pesar de que los objetivos planteados inicialmente han sido alcanzados, el proyecto presenta múltiples posibilidades de ampliación y mejora que podrían abordarse en trabajos futuros o en una evolución real de la aplicación.
+
+Una primera línea de mejora sería la ampliación del frontend, desarrollando una interfaz más completa y visual que permita al usuario gestionar de forma gráfica sus parcelas, visualizar mapas interactivos y consultar estadísticas de la explotación. La integración directa de mapas SIGPAC o servicios GIS permitiría una experiencia de usuario más intuitiva y reduciría aún más la dependencia de herramientas externas.
+
+Otra posible mejora consiste en enriquecer el modelo de inteligencia artificial incorporando más variables agronómicas, como datos climáticos históricos, previsiones meteorológicas, características del suelo o precios de mercado de los cultivos. De este modo, las propuestas de cultivo podrían no solo cumplir con la normativa de la PAC, sino también optimizar la rentabilidad económica de la explotación.
+
+También sería interesante permitir la comparación automática entre distintas propuestas de cultivo para una misma campaña, evaluando diferentes combinaciones de ecorregímenes y cultivos permitidos. Esto ofrecería al agricultor una visión más amplia de las alternativas disponibles y facilitaría la toma de decisiones estratégicas.
+
+Desde el punto de vista de la gestión administrativa, una futura ampliación podría incluir la generación automática de documentación necesaria para la solicitud de ayudas, así como alertas y recordatorios sobre plazos administrativos, reduciendo aún más la carga burocrática asociada a la PAC.
+
+En cuanto a la colaboración, el sistema podría evolucionar para permitir la gestión compartida de explotaciones entre distintos usuarios, como agricultores, técnicos agrónomos o asesores, con distintos niveles de permisos. Esto facilitaría el trabajo conjunto y mejoraría la comunicación entre las partes implicadas.
+
+Por último, una línea de trabajo relevante sería la validación del sistema mediante pruebas piloto en explotaciones reales durante varias campañas, lo que permitiría evaluar de forma objetiva el impacto de la herramienta en la productividad, el cumplimiento normativo y la reducción del tiempo dedicado a tareas administrativas.
+
+En conclusión, el proyecto sienta una base sólida sobre la que desarrollar una solución más completa y ambiciosa, demostrando el papel fundamental que pueden desempeñar las tecnologías digitales en la modernización y sostenibilidad del sector agrícola.

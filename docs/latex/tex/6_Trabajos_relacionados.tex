@@ -1,0 +1,166 @@
+\capitulo{6}{Trabajos relacionados}
+
+\section{Introducción a los trabajos relacionados}
+
+En este apartado se analizan distintas aplicaciones, plataformas y herramientas existentes que abordan, de forma parcial o total, problemas similares a los tratados en el presente proyecto. El objetivo no es únicamente enumerar soluciones existentes, sino contextualizar el sistema desarrollado dentro del panorama actual de herramientas digitales aplicadas al sector agrícola.
+
+El análisis de trabajos relacionados permite identificar:
+\begin{itemize}
+    \item Qué problemas ya están siendo abordados.
+    \item Qué limitaciones presentan las soluciones actuales.
+    \item Qué aspectos innovadores aporta el proyecto desarrollado.
+    \item En qué medida se diferencia de herramientas comerciales o institucionales.
+\end{itemize}
+
+\section{Aplicaciones oficiales relacionadas con la PAC}
+\subsection{SIGPAC (Sistema de Información Geográfica de Parcelas Agrícolas)}
+
+El SIGPAC es una herramienta oficial utilizada para la identificación geográfica de parcelas agrícolas. Permite consultar información como:
+\begin{itemize}
+    \item Localización de parcelas y recintos.
+    \item Superficie declarable.
+    \item Uso SIGPAC.
+    \item Límites geográficos oficiales.
+\end{itemize}
+
+Sin embargo, el SIGPAC presenta varias limitaciones desde el punto de vista del agricultor:
+\begin{itemize}
+    \item No almacena histórico de cultivos.
+    \item No permite planificación de campañas futuras.
+    \item No ofrece ayuda en la toma de decisiones.
+    \item Requiere búsquedas manuales parcela a parcela.
+\end{itemize}
+
+El proyecto desarrollado no sustituye al SIGPAC, sino que lo complementa, facilitando el acceso directo a cada parcela mediante enlaces automáticos y eliminando la necesidad de búsquedas repetitivas.
+
+\subsection{Sistemas autonómicos de gestión PAC}
+Muchas comunidades autónomas disponen de plataformas propias para la gestión de la solicitud PAC. 
+Estas herramientas suelen centrarse en:
+\begin{itemize}
+    \item La tramitación administrativa.
+    \item La validación de datos declarados.
+    \item La comunicación con la administración.
+\end{itemize}
+
+No obstante, estas plataformas presentan carencias importantes:
+\begin{itemize}
+    \item Interfaces complejas.
+    \item Escasa orientación al agricultor.
+    \item Falta de visión global de la explotación.
+    \item Ausencia de planificación agronómica.
+\end{itemize}
+
+Frente a ello, la API desarrollada pone el foco en la gestión previa a la solicitud, ayudando al agricultor a planificar correctamente antes de declarar.
+
+\section{Software comercial de gestión agrícola}
+\subsection{Cuadernos digitales de explotación}
+Existen diversas soluciones comerciales conocidas como “cuadernos de explotación digital”\cite{sativum}, cuyo objetivo es registrar actividades agrícolas como:
+\begin{itemize}
+    \item Tratamientos fitosanitarios.
+    \item Labores agrícolas.
+    \item Siembras y cosechas.
+    \item Insumos utilizados.
+\end{itemize}
+
+Si bien estas herramientas suponen un avance importante, presentan varias limitaciones en relación con este proyecto:
+\begin{itemize}
+    \item Enfoque en el registro, no en la planificación.
+    \item Escasa integración con criterios PAC complejos.
+    \item Dependencia de licencias de pago.
+    \item Falta de personalización para explotaciones pequeñas.
+\end{itemize}
+
+El proyecto desarrollado amplía este concepto, incorporando no solo el registro, sino también el análisis histórico y la generación de propuestas.
+
+\subsection{Plataformas de gestión integral de explotaciones}
+
+Algunas plataformas ofrecen soluciones integrales que incluyen mapas, gestión de parcelas y análisis productivo. No obstante, suelen estar orientadas a:
+\begin{itemize}
+    \item Grandes explotaciones.
+    \item Agricultura de precisión.
+    \item Uso intensivo de sensores y maquinaria avanzada.
+\end{itemize}
+
+Esto provoca que muchas explotaciones familiares queden fuera de su alcance por:
+\begin{itemize}
+    \item Coste elevado.
+    \item Complejidad técnica.
+    \item Necesidad de formación especializada.
+\end{itemize}
+
+El sistema propuesto se posiciona como una alternativa más accesible y adaptada a explotaciones de tamaño medio.
+
+\section{Herramientas basadas en hojas de cálculo}
+
+En la práctica real, una gran parte de los agricultores siguen utilizando hojas de cálculo para:
+\begin{itemize}
+    \item Registrar cultivos por campaña.
+    \item Calcular superficies.
+    \item Preparar documentación PAC.
+\end{itemize}
+
+Aunque este método es flexible, presenta importantes inconvenientes:
+\begin{itemize}
+    \item Falta de validación automática.
+    \item Alto riesgo de errores.
+    \item Dificultad para mantener históricos coherentes.
+    \item Imposibilidad de aplicar reglas complejas de forma automática.
+\end{itemize}
+
+El proyecto automatiza estos procesos, manteniendo la familiaridad del formato Excel para importación y exportación, pero aportando robustez y coherencia mediante una base de datos estructurada.
+
+\section{Uso de inteligencia artificial en agricultura}
+
+\subsection{Sistemas de recomendación agronómica}
+
+En los últimos años han surgido soluciones que emplean inteligencia artificial para:
+\begin{itemize}
+    \item Recomendar cultivos.
+    \item Optimizar fertilización.
+    \item Predecir rendimientos.
+\end{itemize}
+
+Sin embargo, muchas de estas soluciones se centran exclusivamente en variables productivas o climáticas, dejando de lado los requisitos normativos de la PAC.
+
+El proyecto desarrollado introduce una novedad relevante:
+
+la integración de criterios administrativos y normativos en el proceso de recomendación, algo poco habitual en las soluciones actuales.
+
+\subsection{IA como apoyo, no como sustitución}
+
+A diferencia de otros sistemas que proponen decisiones cerradas, la IA utilizada en este proyecto actúa como una herramienta de apoyo. Las propuestas generadas:
+\begin{itemize}
+    \item Se guardan inicialmente como borrador.
+    \item Incluyen justificaciones comprensibles.
+    \item Pueden ser revisadas y modificadas por el usuario.
+\end{itemize}
+
+Este enfoque resulta más adecuado para un entorno donde la experiencia del agricultor sigue siendo fundamental.
+
+\section{Comparativa global con el proyecto desarrollado}
+De forma resumida, las principales diferencias entre las soluciones existentes y el proyecto desarrollado son:
+\begin{itemize}
+    \item Integración del histórico de cultivos por parcela.
+    \item Generación automática de propuestas para campañas futuras.
+    \item Enfoque específico en el cumplimiento de la PAC.
+    \item Uso de IA con criterios normativos.
+    \item Accesibilidad y simplicidad para el usuario final.
+    \item Eliminación de búsquedas manuales repetitivas en SIGPAC.
+\end{itemize}
+
+\section{Aportación diferencial del proyecto}
+El valor diferencial del proyecto no reside en una única funcionalidad, sino en la combinación de varias características:
+\begin{itemize}
+    \item Digitalización de procesos tradicionalmente manuales.
+    \item Centralización de la información de la explotación.
+    \item Reducción de errores administrativos.
+    \item Ahorro de tiempo en la planificación anual.
+    \item Mejora en la comprensión de los requisitos PAC.
+\end{itemize}
+
+Esta combinación convierte la aplicación en una herramienta práctica y alineada con las necesidades reales del sector agrícola.
+
+\section{Síntesis del capítulo}
+En este capítulo se ha analizado el panorama de herramientas y aplicaciones relacionadas con la gestión agrícola y la PAC. A partir de este análisis se observa que, aunque existen múltiples soluciones parciales, pocas abordan de forma conjunta la planificación, el histórico de cultivos y el cumplimiento normativo.
+
+El proyecto desarrollado se posiciona como una solución intermedia entre herramientas institucionales y software comercial complejo, aportando una alternativa accesible, flexible y adaptada a explotaciones reales.

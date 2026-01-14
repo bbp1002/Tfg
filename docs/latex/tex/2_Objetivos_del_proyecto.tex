@@ -1,0 +1,78 @@
+\capitulo{2}{Objetivos del proyecto}
+
+El objetivo principal de este proyecto es el desarrollo de una aplicación web orientada a la gestión de explotaciones agrícolas que facilite el cumplimiento de los requisitos establecidos por la Política Agraria Común (PAC). La aplicación pretende reducir la carga administrativa del agricultor mediante la automatización de tareas repetitivas, la centralización de la información y el uso de herramientas de apoyo a la toma de decisiones basadas en inteligencia artificial.
+
+Para alcanzar este objetivo general, se definen una serie de objetivos específicos que guían el diseño, desarrollo e implementación del sistema.
+
+\begin{table}
+\centering
+\caption{Resumen de los objetivos del proyecto}
+\label{tab:objetivos}
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Tipo} & \textbf{Descripción} \\ \hline
+Objetivo general & 
+Desarrollar una aplicación web que permita gestionar la información agrícola de una explotación y generar propuestas de cultivo conforme a los criterios de la Política Agraria Común (PAC). \\ \hline
+Objetivo específico & 
+Permitir la importación automática de datos de la PAC a partir de archivos Excel oficiales. \\ \hline
+Objetivo específico & 
+Gestionar parcelas, recintos y su histórico de cultivos por campañas agrícolas. \\ \hline
+Objetivo específico & 
+Generar propuestas de cultivo mediante el uso de inteligencia artificial, teniendo en cuenta rotaciones y criterios PAC. \\ \hline
+Objetivo específico & 
+Facilitar la exportación de resultados y la integración con el visor SIGPAC. \\ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Objetivo general}\label{objetivo-general}
+Diseñar e implementar una plataforma software que permita a los agricultores gestionar de forma eficiente sus parcelas y cultivos, integrando datos oficiales del SIGPAC, manteniendo un histórico por campañas y generando propuestas de cultivo que cumplan con la normativa PAC vigente, todo ello mediante una arquitectura segura, escalable y fácilmente extensible.
+
+\section{Objetivos especificos}\label{objetivos-especificos}
+\begin{itemize}
+\tightlist
+\item
+  Desarrollar una API REST utilizando ASP.NET Core que sirva como núcleo del sistema, permitiendo la gestión de usuarios, parcelas, recintos, campañas y propuestas de cultivo.
+\item
+Implementar un sistema de importación de datos PAC desde archivos Excel, permitiendo cargar información oficial del SIGPAC de forma automatizada y evitando errores derivados de la introducción manual de datos.
+\item
+Diseñar un modelo de datos que permita la gestión de parcelas y recintos, incluyendo la posibilidad de asignar nombres personalizados para facilitar su identificación por parte del agricultor.
+\item
+Mantener un histórico de cultivos por campaña, de forma que el sistema pueda analizar la evolución de cada parcela y verificar el cumplimiento de los criterios de rotación y diversificación exigidos por la PAC.
+\item
+Integrar un módulo de validación del cumplimiento normativo, comprobando de manera automática los criterios asociados a las Buenas Condiciones Agrarias y Medioambientales (BCAM) y a los ecorregímenes seleccionados.
+\item
+Incorporar un sistema de generación de propuestas de cultivo mediante inteligencia artificial, utilizando el modelo Google Gemini, que tenga en cuenta los datos históricos, los criterios normativos y las preferencias del agricultor.
+\item
+Permitir el guardado de propuestas de cultivo en estado borrador, facilitando su revisión, modificación y validación antes de su aplicación definitiva.
+\item
+Implementar la exportación de propuestas a formato Excel, de manera que el agricultor pueda presentar o compartir fácilmente la información generada con asesorías agrarias u organismos oficiales.
+\item
+Proporcionar enlaces directos al visor SIGPAC, facilitando la consulta visual de las parcelas oficiales sin necesidad de abandonar la aplicación.
+\item
+Garantizar la seguridad del sistema mediante un mecanismo de autenticación basado en JSON Web Tokens (JWT), asegurando que únicamente los usuarios autorizados puedan acceder a sus datos.
+\item
+Facilitar el proceso de pruebas y validación del sistema mediante la integración de herramientas como Swagger y Postman, permitiendo documentar y comprobar el correcto funcionamiento de la API.
+\item
+Utilizar un sistema de control de versiones mediante GitHub \url{https://github.com/bbp1002/Tfg}, promoviendo buenas prácticas de desarrollo colaborativo y trazabilidad del código fuente.
+
+
+  \end{itemize}
+
+  \section{Objetivos técnicos y académicos}\label{objetivos-tecnicos}
+  Desde el punto de vista formativo, el proyecto persigue además los siguientes objetivos:
+  \begin{itemize}
+\tightlist
+\item
+Aplicar los conocimientos adquiridos durante la titulación en el desarrollo de aplicaciones web modernas basadas en arquitecturas cliente-servidor.
+\item
+Profundizar en el uso de Entity Framework Core como herramienta de acceso a datos y mapeo objeto-relacional.
+\item
+Trabajar con bases de datos relacionales gestionadas mediante pgAdmin4.
+\item
+Integrar librerías externas como ClosedXML para la manipulación de archivos Excel.
+\item
+Explorar el uso de modelos de inteligencia artificial generativa en un contexto real y orientado a la toma de decisiones.
+\item
+Desarrollar una solución software alineada con un problema real del entorno profesional.
+\end{itemize}

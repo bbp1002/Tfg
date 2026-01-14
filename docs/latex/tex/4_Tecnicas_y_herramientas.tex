@@ -1,0 +1,301 @@
+\capitulo{4}{Técnicas y herramientas}
+El desarrollo de una aplicación software orientada a la gestión de explotaciones agrícolas y al cumplimiento de la Política Agraria Común requiere la combinación de múltiples técnicas y herramientas que permitan abordar tanto la complejidad funcional del dominio como los requisitos de calidad propios de un sistema informático moderno. En este proyecto se ha realizado una selección consciente de tecnologías que equilibran robustez, facilidad de desarrollo, mantenibilidad y valor formativo.
+
+Este capítulo describe de forma detallada las técnicas y herramientas empleadas, así como los criterios que han motivado su elección, sin profundizar en aspectos de implementación específicos, los cuales se recogen en el anexo técnico correspondiente.
+
+En la Tabla~\ref{tab:tecnologias} se recogen las principales tecnologías y herramientas empleadas tanto en el backend como en el frontend del sistema desarrollado.
+
+\begin{table}[h]
+\centering
+\caption{Tecnologías y herramientas utilizadas en el proyecto}
+\label{tab:tecnologias}
+\begin{tabular}{|p{4cm}|p{3cm}|p{6cm}|}
+\hline
+\textbf{Tecnología} & \textbf{Tipo} & \textbf{Uso en el proyecto} \\
+\hline
+ASP.NET Core\cite{aspnetcore} & Framework backend & Desarrollo de la API REST y lógica de negocio \\
+\hline
+Entity Framework Core\cite{entityframework} & ORM & Acceso y persistencia de datos en la base de datos \\
+\hline
+PostgreSQL\cite{postgresql} & Base de datos & Almacenamiento de parcelas, recintos y propuestas \\
+\hline
+ClosedXML\cite{closedxml} & Librería & Importación y exportación de archivos Excel PAC \\
+\hline
+JWT\cite{jwt} & Seguridad & Autenticación y autorización de usuarios \\
+\hline
+React\cite{react} & Framework frontend & Desarrollo de la interfaz web para el usuario agricultor \\
+\hline
+Google Gemini\cite{gemini} & Inteligencia Artificial & Generación de propuestas de cultivo para campañas futuras \\
+\hline
+Swagger & Documentación & Pruebas y documentación interactiva de la API \\
+\hline
+Postman & Testing & Pruebas manuales de los endpoints REST \\
+\hline
+GitHub\cite{github} & Control de versiones & Almacenamiento del repositorio y control de cambios \\
+\hline
+Fork\cite{fork} & Cliente Git & Gestión visual de ramas y sincronización con GitHub \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section{Enfoque metodológico del desarrollo}
+El proyecto se ha abordado siguiendo un enfoque incremental e iterativo, permitiendo construir el sistema de forma progresiva. Este enfoque ha resultado especialmente adecuado dada la complejidad del dominio agrícola y la necesidad de adaptar el sistema a requisitos que han ido evolucionando conforme se analizaba la normativa PAC y se obtenía retroalimentación de agricultores reales.
+
+El desarrollo se ha estructurado en fases, comenzando por la definición del modelo de datos y las funcionalidades básicas de gestión de parcelas, para posteriormente incorporar elementos más avanzados como la validación normativa, la generación de propuestas mediante inteligencia artificial y la integración con servicios externos.
+
+Este enfoque ha permitido:
+\begin{itemize}
+    \item Validar tempranamente las funcionalidades principales.
+    \item Reducir el riesgo de errores de diseño.
+    \item Adaptar el sistema a necesidades reales detectadas durante el desarrollo.
+    \item Mantener una visión global del proyecto sin perder flexibilidad.
+\end{itemize}
+
+\section{Arquitectura cliente-servidor}
+La aplicación se ha diseñado siguiendo una arquitectura cliente-servidor basada en servicios web, en la que el backend actúa como núcleo central del sistema y expone su funcionalidad mediante una API REST.
+
+Este tipo de arquitectura resulta especialmente adecuada para aplicaciones de gestión, ya que permite desacoplar completamente la lógica de negocio de la interfaz de usuario. De este modo, el sistema puede evolucionar de forma independiente en ambos niveles, facilitando futuras ampliaciones o cambios tecnológicos.
+
+Entre las principales ventajas de esta arquitectura destacan:
+\begin{itemize}
+    \item Escalabilidad del sistema.
+    \item Reutilización del backend por distintos clientes.
+    \item Mayor facilidad de mantenimiento.
+    \item Posibilidad de integración con herramientas externas.
+\end{itemize}
+
+\section{Desarrollo del backend con ASP.NET Core}
+El backend de la aplicación se ha desarrollado utilizando ASP.NET Core, un framework moderno, multiplataforma y de código abierto. Esta tecnología se ha consolidado en los últimos años como una de las principales opciones para el desarrollo de APIs REST robustas y de alto rendimiento.
+
+La elección de ASP.NET Core responde tanto a criterios técnicos como académicos. Desde el punto de vista formativo, permite aplicar conocimientos avanzados de desarrollo backend adquiridos durante la titulación. Desde el punto de vista práctico, ofrece un entorno estable y ampliamente utilizado en entornos profesionales.
+
+ASP.NET Core proporciona:
+\begin{itemize}
+    \item Soporte nativo para APIs REST.
+    \item Un sistema de inyección de dependencias integrado.
+    \item Gestión eficiente de peticiones HTTP.
+    \item Facilidad para implementar mecanismos de seguridad.
+\end{itemize}
+
+\section{Diseño orientado a servicios y separación de responsabilidades}
+Uno de los principios fundamentales aplicados en el desarrollo ha sido la separación de responsabilidades. El sistema se ha estructurado de forma que cada componente tenga una función claramente definida.
+
+Este enfoque mejora:
+\begin{itemize}
+    \item La legibilidad del código.
+    \item La facilidad de mantenimiento.
+    \item La capacidad de realizar pruebas.
+    \item La extensibilidad del sistema.
+\end{itemize}
+La lógica de negocio se ha aislado de los controladores, evitando que estos se conviertan en componentes excesivamente complejos y favoreciendo un diseño más limpio y organizado.
+
+\section{Persistencia de datos y modelo relacional}
+La información gestionada por el sistema presenta una estructura altamente relacional: parcelas, recintos, campañas, cultivos, propuestas y usuarios mantienen relaciones claras entre sí. Por este motivo, se ha optado por una base de datos relacional como mecanismo de persistencia.
+
+El uso de un modelo relacional permite:
+\begin{itemize}
+    \item Garantizar la integridad de los datos.
+    \item Representar fielmente la realidad de una explotación agrícola.
+    \item Facilitar consultas complejas sobre históricos de cultivos.
+    \item Mantener consistencia entre campañas agrícolas.
+\end{itemize}
+
+\section{Uso de Entity Framework Core como ORM}
+Para el acceso a datos se ha empleado Entity Framework Core, un framework de mapeo objeto-relacional que permite interactuar con la base de datos utilizando entidades del dominio.
+
+Este enfoque reduce significativamente la complejidad del código de acceso a datos y mejora la productividad del desarrollo. Además, permite centrarse en el diseño del modelo de dominio, que en este proyecto es especialmente relevante debido a la complejidad de la normativa PAC.
+
+El uso de un ORM aporta beneficios como: abstracción del lenguaje SQL, reducción de errores, mayor coherencia entre el modelo lógico y físico y
+facilidad para evolucionar el esquema de datos.
+
+\section{Gestión de información histórica}
+Uno de los aspectos más relevantes del proyecto es la gestión del histórico de cultivos por campaña. Este histórico resulta imprescindible para verificar el cumplimiento de los requisitos de rotación y diversificación exigidos por la PAC.
+
+El sistema se ha diseñado para conservar esta información de forma estructurada, permitiendo:
+\begin{itemize}
+    \item Consultar cultivos de campañas anteriores.
+    \item Analizar la evolución de cada parcela.
+    \item Utilizar estos datos como base para la generación de propuestas futuras.
+\end{itemize}
+
+Esta capacidad supone una mejora sustancial respecto a la gestión tradicional basada en documentos en papel o archivos dispersos.
+
+\section{Importación de datos desde Excel}
+
+El uso de hojas de cálculo es una práctica habitual en el sector agrícola. Por este motivo, el sistema incorpora mecanismos para importar datos PAC desde archivos Excel, facilitando la integración con información oficial existente.
+
+Esta funcionalidad permite:
+
+\begin{itemize}
+    \item Reducir la introducción manual de datos.
+    \item Minimizar errores humanos.
+    \item Aprovechar información histórica ya disponible.
+\end{itemize}
+
+La importación de datos se concibe como un paso clave en el proceso de digitalización de la explotación.
+
+\section{Exportación de información en formatos estándar}
+Del mismo modo, el sistema permite exportar propuestas de cultivo a formato Excel, garantizando que la información generada pueda ser compartida fácilmente con asesorías agrarias o utilizada como documentación de apoyo.
+
+El uso de formatos estándar favorece la aceptación de la herramienta por parte del agricultor, al no imponer cambios bruscos en sus hábitos de trabajo.
+
+\section{Seguridad y control de acceso}
+La seguridad es un aspecto fundamental del sistema, ya que se gestionan datos sensibles relacionados con explotaciones agrícolas. Para garantizar la protección de esta información se ha implementado un sistema de autenticación basado en JSON Web Tokens (JWT).
+
+Este mecanismo permite:
+
+\begin{itemize}
+    \item Identificar de forma segura a los usuarios.
+    \item Restringir el acceso a información privada.
+    \item Mantener la confidencialidad de los datos.
+\end{itemize}
+
+\section{Integración con servicios externos}
+El proyecto integra servicios externos relevantes para el dominio agrícola, como el visor SIGPAC. Esta integración permite al agricultor acceder directamente a la representación gráfica oficial de sus parcelas sin realizar búsquedas manuales repetitivas.
+
+Este aspecto ha sido especialmente valorado durante las entrevistas con agricultores, ya que reduce considerablemente el tiempo dedicado a tareas de identificación de parcelas.
+
+\section{Uso de inteligencia artificial como herramienta de apoyo}
+La inteligencia artificial se ha integrado como un sistema de apoyo a la toma de decisiones, no como un sustituto del agricultor. El modelo utilizado analiza datos históricos y criterios normativos para generar propuestas coherentes, reduciendo la complejidad del proceso de planificación.
+
+Este enfoque refuerza el carácter innovador del proyecto y demuestra el potencial de la IA aplicada a problemas administrativos del sector agrario.
+
+\section{Herramientas de documentación y validación}
+El uso de herramientas como Swagger y Postman ha sido fundamental para documentar la API y validar su correcto funcionamiento. Estas herramientas permiten simular escenarios reales de uso y verificar que el sistema responde adecuadamente ante distintas situaciones.
+
+\section{Control de versiones y buenas prácticas}
+El control de versiones mediante Git y GitHub ha permitido mantener un historial claro del desarrollo, facilitando la gestión de cambios y promoviendo buenas prácticas de ingeniería del software.
+
+\section{Digitalización del sector agrícola como contexto tecnológico}
+La agricultura ha experimentado en los últimos años un proceso progresivo de digitalización, impulsado tanto por la necesidad de optimizar recursos como por el aumento de las exigencias administrativas impuestas por las políticas agrarias europeas. Sin embargo, este proceso no se ha producido de manera homogénea, especialmente en explotaciones familiares o de pequeño y mediano tamaño, donde todavía es habitual el uso de documentos en papel y hojas de cálculo no estructuradas.
+
+En este contexto, la elección de herramientas informáticas modernas no responde únicamente a criterios técnicos, sino también a la necesidad de crear soluciones accesibles, comprensibles y adaptadas a usuarios con distintos niveles de alfabetización digital. El proyecto se sitúa precisamente en este punto de intersección entre tecnología y realidad del sector primario.
+
+\section{Justificación de tecnologías open source}
+Una decisión relevante en el desarrollo del proyecto ha sido el uso mayoritario de tecnologías de código abierto. Esta elección responde a varios factores clave:
+\begin{itemize}
+    \item Accesibilidad económica, especialmente relevante en el ámbito agrícola.
+    \item Transparencia en el funcionamiento del software.
+    \item Amplia comunidad de usuarios y desarrolladores.
+    \item Abundancia de documentación y recursos formativos.
+\end{itemize}
+
+El uso de tecnologías open source garantiza que el sistema pueda ser mantenido, ampliado o adaptado en el futuro sin depender de licencias propietarias, lo cual es fundamental para la sostenibilidad del proyecto a largo plazo.
+
+\section{Elección del lenguaje de programación y su impacto formativo}
+El lenguaje C# ha sido utilizado como base del desarrollo backend. Más allá de sus características técnicas, esta elección tiene una clara justificación académica y formativa.
+
+C# es un lenguaje fuertemente tipado, lo que favorece:
+\begin{itemize}
+    \item La detección temprana de errores.
+    \item El diseño estructurado del software.
+    \item El uso de patrones de diseño.
+    \item El desarrollo de aplicaciones mantenibles.
+\end{itemize}
+
+Además, su uso en entornos profesionales convierte este proyecto en una experiencia alineada con las exigencias del mercado laboral.
+
+\section{Gestión de complejidad normativa mediante software}
+
+Uno de los principales retos del proyecto ha sido trasladar la complejidad de la normativa PAC a un sistema informático comprensible. Las normas relacionadas con BCAM, ecorregímenes y rotación de cultivos presentan múltiples condiciones interdependientes que resultan difíciles de gestionar manualmente.
+
+El uso de software permite:
+\begin{itemize}
+    \item Sistematizar reglas complejas.
+    \item Evitar interpretaciones erróneas.
+    \item Aplicar criterios de forma homogénea.
+    \item Reducir la carga cognitiva del agricultor.
+\end{itemize}
+
+Este aspecto justifica el uso de técnicas de validación automática y generación de propuestas asistidas por IA.
+
+\section{Tratamiento estructurado de la información agrícola}
+
+La información agrícola presenta características particulares:
+\begin{itemize}
+    \item Alta repetitividad por campañas.
+    \item Dependencia temporal.
+    \item Relación directa con el territorio.
+    \item Importancia del contexto histórico.
+\end{itemize}
+
+Por ello, el sistema ha sido diseñado para tratar la información de manera estructurada, permitiendo consultas y análisis que serían prácticamente inviables mediante métodos manuales.
+
+\section{Persistencia histórica como herramienta de decisión}
+
+La persistencia del histórico de cultivos no se concibe únicamente como un mecanismo de almacenamiento, sino como una herramienta clave para la toma de decisiones. El conocimiento del pasado productivo de una parcela es fundamental para:
+\begin{itemize}
+    \item Planificar rotaciones.
+    \item Cumplir criterios medioambientales.
+    \item Optimizar la productividad.
+    \item Prevenir problemas agronómicos.
+\end{itemize}
+
+Este enfoque refuerza el valor añadido del sistema frente a soluciones tradicionales.
+
+\section{Automatización de tareas administrativas repetitivas}
+
+Una de las principales ventajas del uso de herramientas software en el sector agrícola es la automatización de tareas administrativas que, tradicionalmente, consumen una gran cantidad de tiempo.
+
+Entre estas tareas destacan:
+\begin{itemize}
+    \item Revisión de documentación PAC.
+    \item Búsqueda de parcelas en SIGPAC.
+    \item Cálculo de superficies por cultivo.
+    \item Verificación de porcentajes exigidos.
+\end{itemize}
+
+El proyecto automatiza gran parte de estos procesos, permitiendo al agricultor centrarse en la toma de decisiones estratégicas.
+
+\section{Integración de inteligencia artificial como sistema de apoyo}
+
+La inteligencia artificial se ha utilizado como un sistema de apoyo, no como un sistema de decisión autónomo. Este enfoque resulta especialmente importante en un contexto donde la experiencia del agricultor sigue siendo insustituible.
+
+La IA actúa como:
+\begin{itemize}
+    \item Asistente en la planificación.
+    \item Herramienta de análisis de escenarios.
+    \item Mecanismo de validación preliminar.
+    \item Generador de propuestas justificadas.
+\end{itemize}
+
+Esta integración demuestra un uso responsable y realista de la tecnología.
+
+\section{Diseño centrado en el usuario agrícola}
+
+Aunque el proyecto se centra principalmente en el backend, las decisiones tecnológicas han tenido en cuenta el perfil del usuario final. El agricultor suele enfrentarse a interfaces complejas y poco intuitivas, lo que provoca rechazo hacia nuevas herramientas.
+
+Por ello, se ha buscado:
+\begin{itemize}
+    \item Simplicidad en las operaciones.
+    \item Uso de conceptos familiares.
+    \item Minimización de pasos innecesarios.
+    \item Claridad en los resultados obtenidos.
+\end{itemize}
+
+\section{Uso de formatos interoperables}
+
+La interoperabilidad es un factor clave en la aceptación de cualquier herramienta informática. El uso de formatos como Excel permite que el sistema se integre de forma natural en el flujo de trabajo habitual del agricultor y de las asesorías agrarias.
+
+Esto reduce la resistencia al cambio y facilita la adopción progresiva de la aplicación.
+
+\section{Escalabilidad y evolución futura}
+
+Las tecnologías seleccionadas permiten que el sistema pueda crecer de forma progresiva. En el futuro podrían incorporarse:
+\begin{itemize}
+    \item Nuevos ecorregímenes.
+    \item Cambios normativos.
+    \item Integración con sensores o datos climáticos.
+    \item Nuevas herramientas de análisis.
+\end{itemize}
+
+La elección de herramientas modernas garantiza que estas ampliaciones sean viables.
+
+\section{Evaluación del impacto tecnológico del proyecto}
+
+Desde una perspectiva académica, el proyecto permite evaluar el impacto real de la tecnología en un sector tradicional. La aplicación demuestra cómo técnicas modernas de desarrollo software pueden aplicarse con éxito a problemas reales, generando un impacto tangible en la gestión diaria de una explotación agrícola.
+
+\section{Síntesis del capítulo}
+
+Este capítulo ha presentado de forma detallada las técnicas y herramientas empleadas, así como el contexto y la justificación de su uso. La combinación de tecnologías modernas, buenas prácticas de ingeniería del software e integración de inteligencia artificial da lugar a una solución sólida, extensible y alineada con las necesidades reales del sector agrícola.

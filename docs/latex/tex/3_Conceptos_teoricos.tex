@@ -1,0 +1,158 @@
+\capitulo{3}{Conceptos teóricos}
+
+El presente proyecto se enmarca en el ámbito de la gestión de explotaciones agrícolas, un sector tradicionalmente caracterizado por una elevada carga administrativa y una fuerte dependencia de normativas públicas, especialmente en lo relativo a la Política Agraria Común (PAC). Para comprender adecuadamente el alcance y la utilidad de la aplicación desarrollada, resulta necesario introducir una serie de conceptos teóricos fundamentales relacionados con la PAC, el sistema SIGPAC y los métodos habituales de gestión de parcelas y cultivos.
+
+Esta sección tiene como objetivo proporcionar el contexto necesario para entender la problemática abordada, así como justificar las decisiones funcionales del sistema desarrollado, sin entrar todavía en detalles técnicos de implementación, los cuales se describen en el anexo correspondiente.
+\section{La Política Agraria Común (PAC)}\label{pac}
+La Política Agraria Común (PAC)\cite{pac2023} es una de las políticas más relevantes de la Unión Europea y constituye un conjunto de medidas destinadas a apoyar al sector agrícola y garantizar el suministro de alimentos, la sostenibilidad medioambiental y el desarrollo rural. Desde su creación en 1962, la PAC ha evolucionado significativamente, adaptándose a los cambios económicos, sociales y ambientales del contexto europeo.
+\subsection{Objetivos de la PAC}
+Los objetivos principales de la PAC pueden resumirse en los siguientes puntos:
+\begin{itemize}
+\tightlist
+\item
+Garantizar una renta justa a los agricultores.
+\item
+Asegurar el abastecimiento estable de alimentos a la población.
+\item
+Promover prácticas agrícolas sostenibles y respetuosas con el medio ambiente.
+\item
+Favorecer el desarrollo rural y la cohesión territorial.
+\item
+Impulsar la modernización y digitalización del sector agrario.
+\end{itemize}
+
+En la práctica, estos objetivos se traducen en un sistema complejo de ayudas económicas, condicionado al cumplimiento de una serie de requisitos técnicos y medioambientales por parte de los agricultores.
+\subsection{Complejidad administrativa de la PAC}
+Uno de los principales problemas asociados a la PAC es su alta complejidad administrativa. Los agricultores deben justificar cada año:
+\begin{itemize}
+\tightlist
+\item
+Qué cultivos se han sembrado.
+\item
+En qué parcelas y recintos.
+\item
+Durante qué campañas.
+\item
+Bajo qué prácticas agrarias.
+\item
+Cumpliendo qué criterios normativos.
+\end{itemize}
+
+Esta información suele estar dispersa en documentos oficiales, archivos en papel\cite{asajaBurgos}, hojas de cálculo y plataformas digitales externas, lo que dificulta enormemente su gestión, especialmente en explotaciones familiares o de pequeño tamaño, donde no existe personal administrativo especializado.
+
+En muchos casos, la información histórica de cultivos se conserva únicamente en documentación impresa, lo que obliga a realizar búsquedas manuales línea por línea para comprobar rotaciones, superficies o cultivos anteriores.
+
+\subsection{Condicionalidad reforzada (BCAM)}
+
+La PAC actual introduce el concepto de condicionalidad reforzada, que establece una serie de Buenas Condiciones Agrarias y Medioambientales (BCAM)\cite{bcam} de obligado cumplimiento para poder acceder a las ayudas.
+
+Entre las más relevantes para este proyecto se encuentran:
+\begin{itemize}
+    \item 
+BCAM 7: Diversificación o rotación de cultivos.
+    \item 
+BCAM 8: Espacios no productivos y biodiversidad (modificada en campañas recientes).
+
+\end{itemize}
+
+El incumplimiento de estos requisitos puede suponer la pérdida total o parcial de las ayudas, lo que convierte su correcta planificación en un aspecto crítico para los agricultores.
+
+\section{Ecorregímenes} \label{ecorregimenes}
+Los ecorregímenes son prácticas voluntarias incentivadas económicamente dentro de la PAC, orientadas a fomentar una agricultura más sostenible. A diferencia de la condicionalidad reforzada, los ecorregímenes permiten al agricultor elegir a cuáles acogerse, siempre que cumpla los requisitos establecidos.
+\subsection{Principales ecorregímenes en tierras de cultivo}
+Entre los ecorregímenes más relevantes para explotaciones agrícolas se encuentran:
+\begin{itemize}
+    \item Rotación de cultivos con especies mejorantes.
+    \item Siembra directa.
+    \item Espacios de biodiversidad.
+\end{itemize}
+
+Cada uno de ellos impone condiciones específicas relacionadas con porcentajes mínimos de superficie, tipos de cultivo, rotación respecto a campañas anteriores y mantenimiento del suelo.
+
+\subsection{Dificultades en la aplicación de ecorregímenes}
+La aplicación práctica de los ecorregímenes presenta varias dificultades:
+\begin{itemize}
+    \item Los criterios suelen expresarse en porcentajes globales de la explotación, no por parcela individual.
+    \item Es necesario analizar el histórico de cultivos de varias campañas.
+    \item Algunas prácticas son incompatibles entre sí.
+    \item El agricultor debe anticipar decisiones de siembra futuras.
+\end{itemize}
+    
+Estas dificultades hacen que la planificación se realice, en muchos casos, de forma aproximada o basada en la experiencia, sin herramientas que permitan simular escenarios alternativos.
+
+\section{El sistema SIGPAC} \label{sistema-sigpac}
+El Sistema de Información Geográfica de Parcelas Agrícolas (SIGPAC)\cite{sigpac} es una base de datos geográfica utilizada en España para identificar y localizar las parcelas agrícolas declaradas en la PAC.
+\subsection{Estructura del SIGPAC}
+Cada parcela en SIGPAC se identifica mediante una jerarquía de referencias:
+\begin{itemize}
+    \item Provincia
+    \item Municipio
+    \item Agregado
+    \item Zona
+    \item Polígono
+    \item Parcela
+    \item Recinto
+\end{itemize}
+
+Esta estructura permite localizar con precisión cualquier superficie agrícola, pero también introduce una complejidad adicional para el agricultor, que debe conocer o consultar constantemente estos datos. En la imagen~\ref{fig:sigpac} podemos ver como se hace la búsqueda en SIGPAC.
+{\imagen}{
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[\textwidth]{img/Captura de pantalla 2026-01-14 070838.png}
+		\caption{Captura de la búsqueda en SIGPAC}\label{fig:sigpac}
+	\end{figure}
+	\FloatBarrier
+
+\subsection{Uso habitual del SIGPAC por los agricultores}
+CEn la práctica, muchos agricultores no recuerdan las referencias exactas de cada parcela, especialmente cuando gestionan un elevado número de ellas. Esto obliga a:
+\begin{itemize}
+    \item Buscar parcelas una a una en el visor SIGPAC.
+    \item Comparar mapas con documentación impresa.
+    \item Perder tiempo identificando qué parcela corresponde a cada cultivo.
+\end{itemize}
+
+Este problema se agrava cuando se trabaja con documentación histórica o cuando varias parcelas tienen superficies o ubicaciones similares.
+
+\section{Gestión tradicional de explotaciones agrícolas}
+La gestión tradicional de una explotación agrícola se basa en una combinación de documentación en papel, archivos PDF oficiales de campañas anteriores, hojas de cálculo independientes y memoria personal del agricultor.
+
+{\imagen}{
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=\textwidth]{img/Diagrama.jpg}
+		\caption{Diagrama del flujo usado normalmente para gestionar las explotaciones}\label{fig:#1}
+	\end{figure}
+	\FloatBarrier
+}
+
+\subsection{Problemas del enfoque tradicional}
+Este enfoque presenta múltiples inconvenientes:
+\begin{itemize}
+    \item Falta de trazabilidad del histórico de cultivos.
+    \item Dificultad para comprobar rotaciones.
+    \item Riesgo de errores en la declaración PAC.
+    \item Elevado consumo de tiempo en tareas administrativas.
+\end{itemize}
+
+En el entorno familiar del autor del proyecto, estos problemas se traducen en largas jornadas revisando documentos línea por línea, comparando campañas y consultando el visor SIGPAC repetidamente para identificar parcelas concretas.
+
+\section{Digitalización del sector agrario}
+La digitalización del sector agrario se presenta como una oportunidad clave para reducir la carga administrativa y mejorar la toma de decisiones. Sin embargo, muchas soluciones existentes:
+\begin{itemize}
+\item Son complejas.
+\item Están orientadas a grandes explotaciones.
+\item Requieren conocimientos técnicos avanzados.
+\end{itemize}
+
+El proyecto desarrollado busca cubrir este vacío, proporcionando una herramienta sencilla, centralizada y adaptada a explotaciones familiares, capaz de integrar información histórica, normativa y geográfica en un único sistema.
+\section{Inteligencia artificial aplicada a la agricultura}
+En los últimos años, la inteligencia artificial ha comenzado a aplicarse al sector agrícola en ámbitos como la predicción de rendimientos, el análisis de suelos o la optimización del riego. Sin embargo, su uso para la planificación administrativa y normativa sigue siendo limitado.
+
+En este proyecto, la inteligencia artificial se emplea como una herramienta de apoyo a la toma de decisiones, capaz de:
+\begin{itemize}
+\item Analizar históricos de cultivos.
+\item Tener en cuenta criterios normativos.
+\item Proponer alternativas coherentes para futuras campañas.
+\end{itemize}
+
+La IA no sustituye al agricultor, sino que actúa como un sistema de recomendación, reduciendo la complejidad del proceso y facilitando la planificación.
