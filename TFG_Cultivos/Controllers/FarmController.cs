@@ -253,7 +253,7 @@ namespace TFG_Cultivos.Controllers
 
             // 3️ Llamada única a Gemini
             var client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(180);
+            client.Timeout = TimeSpan.FromSeconds(270);
             var request = new HttpRequestMessage(HttpMethod.Post, $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}");
             string systemInstructions = Constants.systemInstructions;
             var parts = new List<object>();
@@ -473,6 +473,50 @@ namespace TFG_Cultivos.Controllers
                 Nombre = parcela.NombrePersonalizado
             });
         }
+
+        [HttpGet("cultivos")]
+        public IActionResult GetCultivos()
+        {
+            var cultivos = new List<string>
+                {
+                    "Trigo blando",
+                    "Trigo duro",
+                    "Cebada",
+                    "Avena",
+                    "Centeno",
+                    "Triticale",
+                    "Maíz",
+                    "Girasol",
+                    "Colza",
+                    "Barbecho",
+                    "Pastos permanentes",
+                    "Lentejas",
+                    "Guisantes",
+                    "Garbanzos",
+                    "Veza",
+                    "Yeros",
+                    "Patata",
+                    "Remolacha azucarera",
+                    "Alfalfa"
+                };
+
+            return Ok(cultivos);
+        }
+
+        [HttpGet("ecorregimenes")]
+        public IActionResult GetEcorregimenes()
+        {
+            var ecorregimenes = new List<string>
+                {
+                    "BCAM-7 DIVERSIFICACION DE CULTIVOS",
+                    "BCAM-7 ROTACIÓN DE CULTIVOS",
+                    "P3: PRÁCTICA DE ROTACIÓN DE CULTIVOS CON ESPECIES MEJORANTES",
+                    "P4: PRÁCTICA DE LA SIEMBRA DIRECTA"
+                };
+
+            return Ok(ecorregimenes);
+        }
+
 
         private static string LimpiarJustificacion(string raw)
         {
