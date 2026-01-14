@@ -1,0 +1,93 @@
+\capitulo{5}{Documentación de usuario}
+\section{Introducción}
+
+Este apéndice describe el uso de la aplicación desde el punto de vista del usuario final. Está orientado principalmente a agricultores o técnicos agrícolas que deseen gestionar su explotación de forma digital y obtener apoyo en la toma de decisiones relacionadas con la Política Agraria Común (PAC).
+
+No se requieren conocimientos técnicos avanzados para el uso del sistema, ya que la aplicación ha sido diseñada para ser intuitiva y accesible.
+
+\section{Requisitos de usuario}
+Para utilizar la aplicación, el usuario debe cumplir los siguientes requisitos mínimos:
+\begin{itemize}
+    \item Disponer de un dispositivo con acceso a Internet.
+    \item Contar con un navegador web actualizado.
+    \item Tener una cuenta de usuario registrada en el sistema.
+    \item Disponer de los ficheros PAC oficiales en formato Excel para la importación de datos.
+\end{itemize}
+No es necesario que el usuario tenga conocimientos informáticos avanzados ni experiencia previa con herramientas de gestión agrícola digital.
+
+\section{Instalación}
+La aplicación se ha diseñado siguiendo un modelo cliente-servidor. El usuario no necesita realizar ninguna instalación local, ya que el acceso se realiza a través de un navegador web.
+
+El backend se ejecuta en un servidor que expone la API, mientras que el frontend proporciona la interfaz gráfica para la interacción con el sistema.
+
+En entornos de pruebas, el acceso a la API puede realizarse también mediante herramientas como Swagger o Postman.
+
+\section{Manual del usuario}
+\subsection{Registro y autenticación}
+
+El primer paso para utilizar la aplicación es el registro de un usuario. Una vez registrado, el usuario puede iniciar sesión introduciendo sus credenciales.
+
+Tras la autenticación, el sistema genera un token de seguridad que permite acceder a las funcionalidades protegidas de la aplicación.
+{\imagen}{
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/Captura de pantalla 2026-01-14 184403.png}
+		\caption{Captura del login de la aplicación}\label{fig:login}
+	\end{figure}
+	\FloatBarrier
+}
+
+\subsection{Gestión de parcelas y recintos}
+Una vez autenticado, el usuario puede gestionar las parcelas de su explotación agrícola. Cada parcela puede contener uno o varios recintos, que representan subdivisiones oficiales del SIGPAC.
+
+El sistema permite asignar un nombre personalizado a cada parcela, facilitando su identificación y evitando la necesidad de recordar referencias administrativas complejas.
+
+El sistema permite asignar un nombre personalizado a cada parcela, facilitando su identificación y evitando la necesidad de recordar referencias administrativas complejas.
+
+Esta funcionalidad surge de la necesidad detectada en explotaciones reales, donde los agricultores suelen identificar las parcelas por nombres tradicionales en lugar de códigos oficiales.
+
+\subsection{Importación de datos PAC}
+La aplicación permite importar datos oficiales de la PAC mediante archivos Excel. Este proceso automatiza una tarea que tradicionalmente se realiza de forma manual, revisando documentos en papel línea por línea.
+
+Durante la importación, el sistema procesa los recintos, superficies y cultivos declarados, almacenándolos en la base de datos para su posterior análisis.
+
+\subsection{Generación de propuestas de cultivo mediante inteligencia artificial}
+La aplicación ofrece la posibilidad de generar propuestas de cultivo para una campaña futura mediante el uso de inteligencia artificial.
+
+La aplicación ofrece la posibilidad de generar propuestas de cultivo para una campaña futura mediante el uso de inteligencia artificial.
+
+El usuario puede seleccionar:
+\begin{itemize}
+    \item La campaña objetivo.
+    \item Los ecorregímenes a los que desea optar.
+    \item El listado de cultivos que desea sembrar.
+\end{itemize}
+{\imagen}{
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/Captura de pantalla 2026-01-14 185717.png}
+		\caption{Captura de la pantalla para generar propuestas de cultivos}\label{fig:generar-propuestas}
+	\end{figure}
+	\FloatBarrier
+}
+A partir de esta información y del histórico de la explotación, el sistema genera una propuesta optimizada que tiene en cuenta la rotación de cultivos, la diversificación y el cumplimiento de los criterios de la PAC.
+
+\subsection{Exportación de propuestas a Excel}
+Las propuestas de cultivo pueden exportarse a formato Excel, facilitando su revisión, impresión o envío a terceros como asesores agrarios o entidades colaboradoras.
+
+El archivo exportado incluye información detallada de cada parcela, su superficie, el cultivo recomendado y los motivos de esa recomendación.
+
+\subsection{Integración con el visor SIGPAC}
+
+La aplicación incluye enlaces directos al visor oficial SIGPAC, permitiendo al usuario localizar rápidamente una parcela concreta sin necesidad de introducir manualmente sus referencias.
+
+Esta funcionalidad resulta especialmente útil en explotaciones con un elevado número de parcelas, donde recordar cada referencia administrativa resulta complejo.
+
+{\imagen}{
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/Captura de pantalla 2026-01-14 202526.png}
+		\caption{Captura de la pantalla para buscar una parcela en SIGPAC directamente}\label{fig:ver-sigpac}
+	\end{figure}
+	\FloatBarrier
+}

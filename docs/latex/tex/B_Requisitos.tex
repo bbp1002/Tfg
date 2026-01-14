@@ -1,0 +1,71 @@
+\capitulo{2}{Especificación de Requisitos}
+\section{Introducción}
+
+El presente apéndice recoge la especificación de requisitos del sistema desarrollado, cuyo objetivo es facilitar la gestión de parcelas agrícolas y la planificación de cultivos en el contexto de la Política Agraria Común (PAC).
+
+La especificación de requisitos permite definir de forma clara y estructurada qué funcionalidades debe ofrecer el sistema, así como las restricciones y condiciones bajo las que debe operar. Este documento sirve como referencia tanto para el desarrollo del sistema como para su validación posterior, asegurando que las necesidades de los usuarios finales quedan correctamente cubiertas.
+
+El sistema está orientado principalmente a agricultores y técnicos agrarios que gestionan explotaciones agrícolas y necesitan consultar información histórica, cumplir con los requisitos normativos de la PAC y optimizar la planificación de campañas futuras.
+
+\section{Objetivos generales}
+Los objetivos generales del sistema son los siguientes:
+
+\begin{itemize}
+    \item Facilitar la gestión digital de parcelas y recintos agrícolas asociados a una explotación.
+    \item Centralizar la información histórica de cultivos por campaña y parcela.
+    \item Automatizar la importación de datos procedentes de documentos oficiales de la PAC.
+    \item Asistir al agricultor en la toma de decisiones mediante la generación de propuestas de cultivo basadas en inteligencia artificial.
+    \item Verificar el cumplimiento de los criterios de la PAC, incluyendo la condicionalidad reforzada y los ecorregímenes.
+    \item Reducir el tiempo dedicado a tareas administrativas y a la consulta manual de documentación en papel.
+    \item Proporcionar una interfaz clara y accesible para la consulta y exportación de información.
+\end{itemize}
+
+\section{Catálogo de requisitos}
+\subsection{Requisitos funcionales}
+\begin{itemize}
+    \item \textbf{RF-01}: El sistema debe permitir la autenticación de usuarios mediante credenciales seguras.
+    \item \textbf{RF-02}: El sistema debe permitir la importación de datos PAC desde archivos Excel oficiales.
+    \item \textbf{RF-03}: El sistema debe gestionar parcelas y recintos asociados a un usuario.
+    \item \textbf{RF-04}: El sistema debe almacenar el histórico de cultivos por parcela y campaña.
+    \item \textbf{RF-05}: El sistema debe generar propuestas de cultivo para campañas futuras mediante inteligencia artificial.
+    \item \textbf{RF-06}: El sistema debe permitir seleccionar los ecorregímenes y cultivos objetivo.
+    \item \textbf{RF-07}: El sistema debe validar el cumplimiento de los criterios de la PAC.
+    \item \textbf{RF-08}: El sistema debe permitir guardar propuestas en estado de borrador.
+    \item \textbf{RF-09}: El sistema debe exportar propuestas de cultivo a formato Excel.
+    \item \textbf{RF-10}: El sistema debe permitir la visualización de parcelas en el visor SIGPAC.
+    \item \textbf{RF-11}: El sistema debe permitir asignar nombres personalizados a las parcelas.
+\end{itemize}
+
+\subsection{Requisitos no funcionales}
+\begin{itemize}
+    \item \textbf{RNF-01}: El sistema debe garantizar la seguridad de los datos mediante autenticación y autorización.
+    \item \textbf{RNF-02}: El sistema debe ofrecer tiempos de respuesta adecuados para consultas habituales.
+    \item \textbf{RNF-03}: El sistema debe ser accesible desde cualquier navegador web moderno.
+    \item \textbf{RNF-04}: El sistema debe ser escalable para soportar un aumento de usuarios y explotaciones.
+    \item \textbf{RNF-05}: El sistema debe facilitar la mantenibilidad y evolución futura.
+\end{itemize}
+
+\section{Especificación de requisitos}
+\subsection{RF-02 Importación de datos PAC desde Excel}
+El sistema debe permitir la importación de datos procedentes de archivos Excel oficiales de la PAC. Estos archivos contienen información relativa a parcelas, recintos y cultivos declarados en distintas campañas.
+
+El sistema debe ser capaz de procesar archivos con múltiples hojas, identificando correctamente aquella que contiene los datos relevantes. Durante el proceso de importación, los datos deben validarse para evitar inconsistencias y duplicados.
+
+Una vez importados, los datos quedarán almacenados en la base de datos y asociados al usuario correspondiente, permitiendo su consulta posterior.
+
+\subsection{RF-05 Generación de propuestas de cultivo mediante inteligencia artificial}
+El sistema debe permitir la generación automática de propuestas de cultivo para una campaña futura a partir del histórico de cultivos de la explotación.
+
+Para ello, el usuario podrá seleccionar los ecorregímenes objetivo y el listado de cultivos permitidos. El sistema enviará esta información, junto con los datos históricos de las parcelas, a un servicio de inteligencia artificial que devolverá una propuesta estructurada.
+
+Las propuestas generadas deberán incluir, al menos, el cultivo recomendado para cada recinto y una justificación basada en criterios agronómicos y normativos.
+
+\subsection{RF-08 Guardado de propuestas en borrador}
+El sistema debe permitir que las propuestas generadas se almacenen inicialmente en estado de borrador. Esto permite al usuario revisar, modificar o descartar la propuesta antes de su confirmación definitiva.
+
+Las propuestas en borrador no tendrán efectos sobre campañas cerradas y podrán ser regeneradas o eliminadas en cualquier momento.
+
+\subsection{RF-10 Integración con el visor SIGPAC}
+El sistema debe permitir la visualización de parcelas en el visor SIGPAC oficial mediante la generación automática de enlaces a partir de los datos almacenados en la base de datos.
+
+Esta funcionalidad evita la necesidad de buscar manualmente cada parcela en el visor, facilitando la identificación visual de los recintos y mejorando la experiencia de usuario.

@@ -1,0 +1,101 @@
+\capitulo{1}{Plan de Proyecto Software}
+
+\section{Introducción}
+
+El presente apéndice describe la planificación general seguida para el desarrollo del proyecto software, así como las decisiones adoptadas durante su ejecución. Este proyecto se enmarca dentro del ámbito académico del Trabajo Fin de Grado, pero ha sido concebido desde el inicio con una clara orientación práctica y aplicabilidad real en el sector agrícola.
+
+El origen del proyecto surge a partir de la observación directa de los procesos que realizan agricultores reales en su día a día, concretamente en el entorno familiar del autor. La gestión de parcelas, recintos, históricos de cultivo y el cumplimiento de la normativa de la Política Agraria Común (PAC)\cite{pac2023} se realiza habitualmente de forma manual, apoyándose en documentos en papel, hojas de cálculo independientes y consultas reiteradas al visor SIGPAC. Esta forma de trabajo resulta poco eficiente, propensa a errores y muy dependiente de la memoria del agricultor o de asesorías externas.
+
+Desde el punto de vista académico, el proyecto plantea un reto multidisciplinar, combinando el desarrollo de software backend, el diseño de bases de datos, la integración de inteligencia artificial y la comprensión de una normativa agrícola compleja y cambiante. Por ello, se ha seguido una planificación flexible, adaptada a la evolución progresiva del proyecto y a los descubrimientos realizados durante el desarrollo.
+
+Este apéndice detalla la planificación temporal, así como el estudio de viabilidad técnica, económica y operativa del sistema desarrollado.
+
+\section{Planificación temporal}
+
+La planificación temporal del proyecto se ha estructurado en distintas fases, siguiendo una aproximación iterativa e incremental. Aunque inicialmente se definió una planificación aproximada, esta fue adaptándose a medida que se profundizaba en el dominio del problema y se detectaban nuevas necesidades funcionales.
+
+En una primera fase se realizó un análisis del problema, centrado en comprender el funcionamiento del sistema SIGPAC, la estructura de los datos PAC y los requisitos normativos asociados a los ecorregímenes y las BCAM. Esta fase fue clave para definir correctamente el alcance del proyecto y evitar una solución excesivamente simplificada.
+
+Posteriormente se abordó el diseño del sistema, definiendo el modelo de datos, las entidades principales (parcelas, recintos, campañas, propuestas de cultivo) y la arquitectura general basada en una API REST. Durante esta etapa se tomaron decisiones importantes, como la separación entre parcelas y recintos o el almacenamiento de históricos por campaña.
+
+La fase de desarrollo constituyó el bloque principal del proyecto. En ella se implementaron progresivamente las funcionalidades del sistema, comenzando por la importación de datos desde Excel, la gestión de parcelas y recintos, y la autenticación de usuarios. A continuación, se integró la generación de propuestas de cultivo mediante inteligencia artificial y la exportación de resultados a formato Excel.
+
+Finalmente, se dedicó una fase a pruebas, validación y mejora del sistema, utilizando datos reales y escenarios prácticos proporcionados por agricultores y una técnica agrónoma. Esta fase permitió detectar errores, mejorar la usabilidad y ajustar el comportamiento del sistema a situaciones reales no previstas inicialmente.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{2cm}|p{4cm}|p{6cm}|}
+\hline
+\textbf{Fase} & \textbf{Duración estimada} & \textbf{Resultados principales} \\ \hline
+Análisis & 2 semanas & Definición del problema y alcance \\ \hline
+Diseño & 2 semanas & Modelo de datos y arquitectura \\ \hline
+Desarrollo & 8 semanas & API funcional e integración IA \\ \hline
+Pruebas y validación & 2 semanas & Correcciones y mejoras \\ \hline
+\end{tabular}
+\caption{Planificación temporal del proyecto}
+\label{tab:planificacion}
+\end{table}
+
+\section{Estudio de viabilidad}
+\subsection{Viabilidad técnica}
+
+Desde el punto de vista técnico, el proyecto es completamente viable utilizando tecnologías actuales y ampliamente consolidadas. La elección de una arquitectura basada en una API REST desarrollada con ASP.NET Core permite una clara separación entre la lógica de negocio y la capa de presentación, facilitando futuras ampliaciones del sistema, como el desarrollo de aplicaciones móviles o la integración con plataformas externas.
+
+El uso de Entity Framework Core\cite{entityframework} simplifica la gestión de la base de datos y reduce el riesgo de errores en el acceso a datos. Por su parte, PostgreSQL ofrece robustez, escalabilidad y soporte para estructuras de datos complejas, lo que resulta adecuado para almacenar información histórica por campañas.
+
+Uno de los principales retos técnicos fue la integración de inteligencia artificial, ya que la salida del modelo debía ser estructurada, interpretable y consistente. Para ello, se optó por un prompt estructurado en formato JSON, permitiendo procesar automáticamente la respuesta y almacenarla en la base de datos sin ambigüedades.
+
+En conjunto, las tecnologías seleccionadas permiten desarrollar el sistema sin limitaciones técnicas significativas y garantizan su mantenibilidad a largo plazo.
+
+\subsection{Viabilidad económica}
+
+El análisis de viabilidad económica tiene como objetivo evaluar los costes asociados al desarrollo, implantación y uso del sistema, así como los beneficios potenciales que puede aportar a los usuarios finales.
+
+Aunque el proyecto se ha desarrollado en un contexto académico, resulta relevante realizar una estimación económica que permita valorar su aplicabilidad real en un entorno profesional.
+
+\paragraph{Costes de desarrollo}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{5cm}|p{3cm}|p{2cm}|p{3cm}|}
+\hline
+\textbf{Actividad} & \textbf{Horas estimadas} & \textbf{Coste/hora (€)} & \textbf{Coste total (€)} \\ \hline
+Análisis y documentación & 60 & 20 & 1.200 \\ \hline
+Diseño del sistema & 50 & 20 & 1.000 \\ \hline
+Desarrollo backend & 180 & 20 & 3.600 \\ \hline
+Integración de IA & 60 & 20 & 1.200 \\ \hline
+Pruebas y validación & 50 & 20 & 1.000 \\ \hline
+\textbf{Total estimado} & \textbf{400} &  & \textbf{8.000} \\ \hline
+\end{tabular}
+\caption{Estimación de costes de desarrollo del proyecto}
+\label{tab:costes_desarrollo}
+\end{table}
+
+\paragraph{Costes de infraestructura y software}
+
+El proyecto se apoya fundamentalmente en tecnologías de código abierto, por lo que no existen costes asociados a licencias de software. El entorno de desarrollo, el framework backend, la base de datos y las herramientas de control de versiones son de uso gratuito.
+
+En cuanto a la infraestructura, el sistema puede ejecutarse en un servidor local o en servicios de alojamiento de bajo coste. Para un escenario básico, el coste mensual de alojamiento podría situarse entre 10 y 20 euros, dependiendo del proveedor y de la carga de uso.
+
+La integración de inteligencia artificial mediante la API de Google Gemini presenta un coste variable en función del número de llamadas realizadas. No obstante, al tratarse de una única llamada por campaña y explotación, el coste por usuario resulta reducido y asumible.
+
+\paragraph{Beneficios económicos}
+
+Desde el punto de vista de los beneficios, el sistema desarrollado permite reducir significativamente el tiempo dedicado a tareas administrativas, como la consulta del histórico de parcelas, la revisión manual de documentos PAC o la generación de propuestas de cultivo.
+
+Además, el uso de herramientas automatizadas puede disminuir la dependencia de asesorías externas, cuyo coste suele ser elevado y recurrente. Incluso en casos en los que se mantenga el asesoramiento profesional, el sistema actúa como una herramienta de apoyo que mejora la eficiencia del proceso.
+
+Por tanto, a medio plazo, el ahorro de tiempo y costes compensa ampliamente la inversión inicial estimada para el desarrollo del sistema.
+
+\paragraph{Conclusión económica}
+
+En conclusión, el proyecto presenta una viabilidad económica elevada, con unos costes de desarrollo asumibles y unos costes de explotación reducidos. La relación coste-beneficio resulta favorable, especialmente para explotaciones agrícolas de pequeño y mediano tamaño, que pueden beneficiarse de la digitalización sin necesidad de realizar grandes inversiones.
+
+
+\subsection{Viabilidad operativa}
+
+Desde el punto de vista operativo, el sistema se adapta fácilmente a la forma de trabajo habitual de los agricultores. La importación de datos desde Excel permite reutilizar información ya existente, evitando la necesidad de introducir todos los datos manualmente desde cero.
+
+Durante el análisis del problema se detectó que muchos agricultores mantienen el historial de sus parcelas en documentos en papel o en múltiples hojas de cálculo, lo que obliga a realizar búsquedas manuales línea por línea para localizar información de campañas anteriores. Asimismo, es habitual tener que consultar el visor SIGPAC de forma individual para cada parcela, debido a la dificultad de recordar a qué referencia corresponde cada terreno.
+
+El sistema desarrollado centraliza toda esta información, permitiendo acceder de forma rápida al histórico completo de una parcela y enlazar directamente con el visor SIGPAC\cite{sigpac}. Esto mejora significativamente la operatividad diaria y reduce la carga cognitiva del usuario.

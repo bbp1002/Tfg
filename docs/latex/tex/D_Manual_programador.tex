@@ -1,0 +1,86 @@
+\capitulo{4}{Documentación técnica de programación}
+
+\section{Introducción}
+Este apéndice está dirigido a desarrolladores que deseen comprender el funcionamiento interno del sistema, mantenerlo o ampliarlo en el futuro.
+
+Se describe la estructura del proyecto, los principales componentes de software, las tecnologías empleadas y las decisiones técnicas adoptadas durante el desarrollo. Asimismo, se proporciona información sobre la compilación, ejecución y pruebas del sistema.
+
+\section{Estructura de directorios}
+El proyecto sigue una estructura organizada que facilita la separación de responsabilidades y la mantenibilidad del código. A continuación se describe la estructura principal del backend desarrollado en ASP.NET Core.
+
+\begin{verbatim}
+TFG_Cultivos/
+├── Properties/
+│   ├── launchSettings.json
+├── Controllers/
+│   ├── AuthController.cs
+│   ├── FarmController.cs
+├── Models/
+│   ├── ApplicationUser.cs
+│   ├── DatoAgronomico.cs
+│   ├── GeminiResponseDTO.cs
+│   ├── Parcelas.cs
+│   ├── Recintos.cs
+│   ├── PropuestaCultivo.cs
+│   ├── GenerarPropuestaRequest.cs
+│   ├── ImportPacRequest.cs
+│   ├── LoginRequest.cs
+│   ├── PacContext.cs
+├── Services/
+│   ├── Constants.cs
+│   ├── ExcelConversionService
+├── Program.cs
+└── appsettings.json
+\end{verbatim}
+
+Esta estructura permite aislar la lógica de acceso a datos, los controladores de la API y los servicios auxiliares, facilitando futuras ampliaciones.
+
+\section{Manual del programador}
+\subsection{Backend}
+El backend del sistema se ha desarrollado como una API REST utilizando ASP.NET Core\cite{aspnetcore}. Esta API es responsable de la gestión de usuarios, parcelas, históricos de cultivos y propuestas generadas por inteligencia artificial.
+
+La comunicación se realiza mediante peticiones HTTP siguiendo los principios REST, utilizando formatos JSON para el intercambio de información.
+
+\paragraph{Controladores}
+Los controladores actúan como punto de entrada a la aplicación, recibiendo las peticiones del cliente y delegando la lógica de negocio a los servicios correspondientes.
+\begin{itemize}
+    \item \textbf{AuthController}: gestiona el registro y autenticación de usuarios mediante JWT.
+    \item \textbf{FarmController}: gestiona parcelas, recintos, importación de datos PAC, permite generar, guardar y exportar propuestas de cultivo.
+\end{itemize}
+\subsection{Acceso a datos}
+El acceso a datos se implementa mediante Entity Framework Core, utilizando un enfoque Code First. Las entidades del dominio se definen como clases C\#, y el contexto de datos gestiona la conexión con la base de datos.
+
+La utilización de Entity Framework Core permite abstraer el acceso a la base de datos, facilitando el mantenimiento del código y reduciendo la dependencia de un sistema gestor concreto.
+
+\subsection{Integración con Excel}
+Para la importación y exportación de datos en formato Excel se ha utilizado la biblioteca ClosedXML\cite{closedxml}. Esta librería permite trabajar con archivos Excel de forma sencilla y sin necesidad de dependencias externas como Microsoft Office.
+
+La importación se utiliza principalmente para cargar datos PAC procedentes de ficheros oficiales, mientras que la exportación permite generar informes estructurados con las propuestas de cultivo.
+
+\subsection{Integración con inteligencia artificial}
+El sistema integra un servicio de inteligencia artificial basado en el modelo Google Gemini Flash 2.5\cite{gemini}. Este servicio se utiliza para generar propuestas de cultivo teniendo en cuenta el histórico de parcelas, la rotación de cultivos y los criterios de la PAC.
+
+La comunicación con el servicio de inteligencia artificial se realiza mediante una única llamada por campaña, enviando un prompt estructurado en formato JSON que incluye toda la información necesaria para el análisis global de la explotación.
+
+La respuesta generada por el modelo se procesa y se transforma en entidades del dominio, que se almacenan como propuestas en estado de borrador.
+
+\subsection{Seguridad y autenticación}
+La autenticación del sistema se basa en JSON Web Tokens (JWT)\cite{jwt}. Cada usuario debe autenticarse para acceder a las funcionalidades protegidas de la API.
+
+Este enfoque garantiza que los datos de cada explotación agrícola solo sean accesibles por su propietario, cumpliendo con principios básicos de seguridad y confidencialidad.
+
+\subsection{Frontend}
+El sistema cuenta con un frontend sencillo desarrollado con React\cite{react}, que permite al usuario interactuar con la API de forma intuitiva. Desde la interfaz se pueden consultar parcelas, generar propuestas y exportar resultados.
+
+El frontend se comunica con la API mediante peticiones HTTP, gestionando la autenticación mediante tokens JWT.
+
+\section{Compilación, instalación y ejecución}
+Para ejecutar el proyecto es necesario disponer de un entorno de desarrollo con .NET SDK instalado y un sistema gestor de bases de datos compatible.
+
+Una vez configurada la base de datos y las variables de entorno, el proyecto puede compilarse y ejecutarse mediante los comandos estándar de .NET.
+
+\section{Pruebas del sistema}
+Las pruebas del sistema se han realizado principalmente mediante herramientas como Swagger y Postman, verificando el correcto funcionamiento de los distintos endpoints de la API.
+
+Se han probado escenarios reales como la importación de datos PAC, la generación de propuestas de cultivo y la exportación a Excel, asegurando la coherencia de los datos y la estabilidad del sistema.
+

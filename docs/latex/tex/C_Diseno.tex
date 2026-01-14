@@ -1,0 +1,69 @@
+\capitulo{3}{Especificación de diseño}
+
+\section{Introducción}
+
+En este apéndice se describe el diseño del sistema desarrollado, abordando los aspectos relativos a la organización de los datos, el diseño procedimental y la arquitectura general de la aplicación.
+
+El diseño se ha realizado teniendo en cuenta los requisitos funcionales y no funcionales definidos en el Apéndice B, buscando una solución modular, escalable y fácil de mantener. Asimismo, se ha priorizado la claridad en la estructura del sistema, de forma que pueda ser ampliado en futuras versiones.
+
+\subsection{Diseño de datos}
+El diseño de datos del sistema se basa en un modelo relacional que permite representar de forma estructurada la información asociada a las explotaciones agrícolas, parcelas, recintos y cultivos.
+
+La base de datos se ha diseñado para almacenar tanto información histórica como propuestas de cultivo futuras, manteniendo la trazabilidad entre campañas y facilitando el cumplimiento de los criterios de la PAC.
+
+\subsection{Entidades principales}
+Las principales entidades del sistema son las siguientes:
+
+\begin{itemize}
+    \item \textbf{Usuario}: representa al agricultor o técnico que utiliza el sistema.
+    \item \textbf{Parcela}: identifica una parcela agrícola asociada a un usuario.
+    \item \textbf{Recinto}: subdivisión de una parcela con características agronómicas propias.
+    \item \textbf{Dato agronómico}: almacena el cultivo declarado en un recinto para una campaña concreta.
+    \item \textbf{Propuesta de cultivo}: representa la recomendación generada para una campaña futura.
+\end{itemize}
+
+\subsection{Relaciones entre entidades}
+
+Un usuario puede disponer de múltiples parcelas, y cada parcela puede estar compuesta por uno o varios recintos. Para cada recinto se almacena un histórico de datos agronómicos asociados a distintas campañas.
+
+Las propuestas de cultivo se asocian a un recinto y a una campaña concreta, permitiendo diferenciar entre propuestas en borrador y propuestas definitivas. Este diseño permite mantener el histórico de decisiones y facilita la comparación entre campañas.
+
+\section{Diseño procedimental}
+El diseño procedimental del sistema define el flujo de ejecución de las principales funcionalidades, desde la entrada de datos por parte del usuario hasta su almacenamiento y procesamiento.
+
+El sistema sigue un enfoque orientado a servicios, donde cada funcionalidad principal se implementa como un conjunto de operaciones bien definidas accesibles a través de una API REST.
+
+\subsection{Flujo de importación de datos PAC}
+El proceso de importación comienza cuando el usuario selecciona un archivo Excel correspondiente a una campaña PAC. El sistema valida el archivo, extrae la información relevante y la transforma a un formato interno compatible con el modelo de datos.
+
+Durante este proceso se comprueba la existencia previa de parcelas y recintos, evitando duplicidades y actualizando únicamente la información necesaria. Finalmente, los datos se almacenan asociados al usuario y a la campaña correspondiente.
+
+\subsection{Flujo de generación de propuestas de cultivo}
+La generación de propuestas de cultivo se inicia a petición del usuario, quien selecciona la campaña objetivo, los ecorregímenes de interés y el listado de cultivos permitidos.
+
+El sistema recopila el histórico de cultivos de las campañas anteriores y construye una solicitud estructurada que se envía al servicio de inteligencia artificial. La respuesta recibida se procesa y se almacena como una propuesta en estado de borrador.
+
+\subsection{Flujo de exportación de propuestas a Excel}
+El sistema permite exportar las propuestas de cultivo a un archivo Excel para su consulta o presentación ante organismos oficiales. El archivo generado incluye información identificativa de la parcela y el recinto, así como el cultivo propuesto y su justificación.
+
+Este flujo facilita la interoperabilidad con herramientas externas y reduce la necesidad de transcripción manual de datos.
+
+\section{Diseño arquitectónico}
+El sistema se ha diseñado siguiendo una arquitectura cliente-servidor basada en servicios REST. La lógica de negocio se centraliza en una API desarrollada en ASP.NET Core, mientras que el acceso a los datos se realiza mediante un sistema de persistencia relacional.
+
+La separación entre capas permite desacoplar la lógica de negocio del acceso a datos y de la interfaz de usuario, facilitando la evolución futura del sistema.
+
+\subsection{Componentes principales}
+Los principales componentes del sistema son:
+
+\begin{itemize}
+    \item \textbf{API REST}: gestiona las peticiones del cliente y la lógica de negocio.
+    \item \textbf{Base de datos}: almacena la información persistente del sistema.
+    \item \textbf{Servicio de inteligencia artificial}: encargado de generar las propuestas de cultivo.
+    \item \textbf{Interfaz de usuario}: permite al agricultor interactuar con el sistema.
+\end{itemize}
+
+\subsection{Integración con servicios externos}
+El sistema se integra con servicios externos como el visor SIGPAC, facilitando la localización visual de parcelas, y con servicios de inteligencia artificial para la generación de propuestas de cultivo.
+
+Estas integraciones se realizan mediante llamadas HTTP, manteniendo una única llamada por campaña para optimizar el rendimiento y reducir costes.
