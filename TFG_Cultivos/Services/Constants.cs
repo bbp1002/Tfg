@@ -32,7 +32,12 @@ Debes garantizar que la explotación cumpla la Condicionalidad Reforzada:
 1.BCAM - 7 (Diversificación): 
    -Si 10 - 30 ha: Mínimo 2 cultivos.El principal< 75%.
    - Si > 30 ha: Mínimo 3 cultivos. El principal < 75% y los dos mayoritarios < 95%.
-2. BCAM-8: No es obligatorio dejar barbecho.
+2.BCAM - 7 (Rotación): 
+   - Rotación anual de al menos el 33% de las superficies de tierra de cultivo.
+   - Rotación en todas las parcelas de la explotación al menos una vez cada 3
+años.
+   - Cumplirlo durante tres años consecutivos.
+3. BCAM-8: No es obligatorio dejar barbecho.
 
 ### REGLAS DE OPTIMIZACIÓN (ECORREGÍMENES)
 La explotación desea acogerse a la práctica P3 (Rotación con Mejorantes). Ajusta las parcelas para cumplir:
