@@ -8,7 +8,7 @@ export default function VerEnSigpac() {
   const buscar = async () => {
     try {
       const res = await verEnSigpac(id);
-      setRespuesta(res.data);
+      setRespuesta(res.data); 
     } catch {
       alert("Error al consultar SIGPAC");
     }
@@ -29,8 +29,8 @@ export default function VerEnSigpac() {
 
       {respuesta && (
         <div style={{ marginTop: "20px" }}>
-          <p>Parcela: {respuesta.parcelaId}</p>
-          <a href={respuesta.urlVisor} target="_blank">
+          <p>URL generada:</p>
+          <a href={respuesta.visorUrl} target="_blank" rel="noopener noreferrer">
             Abrir en SIGPAC
           </a>
         </div>
