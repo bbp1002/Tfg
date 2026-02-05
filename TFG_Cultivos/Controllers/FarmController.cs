@@ -474,6 +474,48 @@ namespace TFG_Cultivos.Controllers
             });
         }
 
+        [HttpGet("con-historico")]
+        public async Task<IActionResult> GetParcelasConHistorico()
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var parcelas = await _context.Parcelas
+                .Where(p => p.UsuarioId == usuarioId)
+                .Include(p => p.Recintos)
+                    .ThenInclude(r => r.DatosAgronomicos)
+                .ToListAsync();
+
+            var result = parcelas.Select(p => new ParcelaDto
+            {
+                ParcelaId = p.Id,
+                Nombre = p.NombrePersonalizado,
+
+                Provincia = p.CodigoProvincia,
+                Municipio = p.Municipio,
+                Poligono = p.Poligono,
+                NumeroParcela = p.ParcelaNumero,
+
+                SuperficieTotal = p.Recintos.Sum(r => r.SuperficieSigpac),
+
+                Recintos = p.Recintos.Select(r => new RecintoDto
+                {
+                    RecintoId = r.Id,
+                    Superficie = r.SuperficieSigpac,
+
+                    Historico = r.DatosAgronomicos
+                        .OrderByDescending(d => d.AñoCampaña)
+                        .Select(d => new HistoricoCultivoDto
+                        {
+                            AnioCampania = d.AñoCampaña,
+                            Cultivo = d.EspecieVariedad
+                        })
+                        .ToList()
+                }).ToList()
+            });
+
+            return Ok(result);
+        }
+
         [HttpGet("cultivos")]
         public IActionResult GetCultivos()
         {
