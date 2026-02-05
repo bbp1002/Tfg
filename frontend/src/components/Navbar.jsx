@@ -2,14 +2,37 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
-    <nav style={{ padding: "10px", background: "#eee" }}>
-      <Link to="/login">Login</Link> |{" "}
-      <Link to="/register">Registro</Link> |{" "}
-      <Link to="/importar-pac">Importar PAC</Link> |{" "}
-      <Link to="/generar-propuesta">Propuesta IA</Link> |{" "}
-      <Link to="/exportar-propuesta">Exportar</Link> |{" "}
-      <Link to="/ver-en-sigpac">SIGPAC</Link> |{" "}
-      <Link to="/asignar-nombre">Asignar nombre</Link>
+    <nav
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "25px",
+        padding: "15px 20px",
+        background: "rgba(255, 255, 255, 0.8)",
+        backdropFilter: "blur(6px)",
+        borderBottom: "1px solid #ddd",
+        fontSize: "18px",
+        fontWeight: "500"
+      }}
+    >
+      <Link style={linkStyle} to="/importar-pac">Importar PAC</Link>
+      <Link style={linkStyle} to="/generar-propuesta">Propuesta IA</Link>
+      <Link style={linkStyle} to="/exportar-propuesta">Exportar</Link>
+      <Link style={linkStyle} to="/parcelas">Parcelas</Link>
+      <Link style={linkStyle} to="/ver-en-sigpac">SIGPAC</Link>
+      <Link style={linkStyle} to="/asignar-nombre">Asignar nombre</Link>
     </nav>
   );
 }
+
+const linkStyle = {
+  textDecoration: "none",
+  color: "#333",
+  padding: "8px 12px",
+  borderRadius: "6px",
+  transition: "0.2s",
+};
+
+linkStyle[":hover"] = {
+  background: "#ddd",
+};
