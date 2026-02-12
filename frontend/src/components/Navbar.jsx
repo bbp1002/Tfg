@@ -7,7 +7,7 @@ export default function Navbar() {
         display: "flex",
         justifyContent: "center",
         gap: "25px",
-        padding: "15px 20px",
+        padding: "15px 290px",
         background: "rgba(255, 255, 255, 0.8)",
         backdropFilter: "blur(6px)",
         borderBottom: "1px solid #ddd",
@@ -15,12 +15,10 @@ export default function Navbar() {
         fontWeight: "500"
       }}
     >
+      <Link style={linkStyle} to="/">Home</Link>
       <Link style={linkStyle} to="/importar-pac">Importar PAC</Link>
       <Link style={linkStyle} to="/generar-propuesta">Propuesta IA</Link>
       <Link style={linkStyle} to="/exportar-propuesta">Exportar</Link>
-      <Link style={linkStyle} to="/parcelas">Parcelas</Link>
-      <Link style={linkStyle} to="/ver-en-sigpac">SIGPAC</Link>
-      <Link style={linkStyle} to="/asignar-nombre">Asignar nombre</Link>
     </nav>
   );
 }

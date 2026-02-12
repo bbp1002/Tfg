@@ -33,7 +33,7 @@ function App() {
           <Route path="/exportar-propuesta" element={<ExportarPropuesta />} />
           <Route path="/ver-en-sigpac" element={<VerEnSigpac />} />
           <Route path="/asignar-nombre" element={<AsignarNombre />} />
-          <Route path="/parcelas" element={<ParcelasConHistorico />} />
+          <Route path="/" element={<ParcelasConHistorico />} />
         </Routes>
       </div>
     </BrowserRouter>
