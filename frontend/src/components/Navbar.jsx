@@ -4,15 +4,21 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "25px",
-        padding: "15px 290px",
+        width: "100%",
+        position: "fixed",
+        top: "105px",
+        left: 0,
+        zIndex: 1000,
+
         background: "rgba(255, 255, 255, 0.8)",
         backdropFilter: "blur(6px)",
         borderBottom: "1px solid #ddd",
-        fontSize: "18px",
-        fontWeight: "500"
+
+        display: "flex",
+        justifyContent: "center",
+        gap: "25px",
+
+        padding: "15px 20px" 
       }}
     >
       <Link style={linkStyle} to="/">Home</Link>
