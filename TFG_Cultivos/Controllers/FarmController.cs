@@ -17,7 +17,7 @@ namespace TFG_Cultivos.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize] // Todos los endpoints requieren autenticación
     public class FarmController : ControllerBase
     {
         private readonly PacContext _context;
@@ -33,6 +33,10 @@ namespace TFG_Cultivos.Controllers
             _apiKey = _config["apiKeyGemini"];
         }
 
+        // --------------------------------------------------------------------
+        // GET api/farm/getAll
+        // Devuelve todas las parcelas del usuario (sin recintos ni histórico)
+        // --------------------------------------------------------------------
         [Route("getAll")]
         [HttpGet]
         public IActionResult GetAll()
@@ -41,7 +45,11 @@ namespace TFG_Cultivos.Controllers
             return Ok(parcelas);
         }
 
-
+        // --------------------------------------------------------------------
+        // POST api/farm/importar-pac
+        // Importa un archivo PAC en Excel, detecta parcelas, recintos y datos
+        // agronómicos, y los guarda en la base de datos.
+        // --------------------------------------------------------------------
         [HttpPost("importar-pac")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> ImportarPacDesdeExcel([FromForm] ImportPacRequest request)
@@ -54,21 +62,25 @@ namespace TFG_Cultivos.Controllers
 
             var errores = new List<string>();
 
+            // Convierte el archivo a XLSX si viene en otro formato
             var workbook = _excelService.ConvertToXlsx(request.ArchivoExcel);
+
+            // Busca la hoja correcta dentro del Excel PAC
             var ws = ObtenerHojaParcelas(workbook);
 
-            int fila = 14;
+            int fila = 14; // La PAC suele empezar en esta fila
 
             while (true)
             {
                 var row = ws.Row(fila);
 
+                // Si la fila está vacía, se asume fin de datos
                 if (row.Cell(2).IsEmpty())
                     break;
 
                 try
                 {
-                    // Validaciones
+                    // Validaciones básicas de polígono y parcela
                     if (!row.Cell(7).TryGetValue<int>(out int poligono))
                     {
                         fila++;
@@ -81,13 +93,16 @@ namespace TFG_Cultivos.Controllers
                         continue;
                     }
 
+                    // -------------------------
                     // PARCELA
+                    // -------------------------
                     var parcela = await _context.Parcelas
                         .FirstOrDefaultAsync(p =>
                             p.UsuarioId == usuarioId &&
                             p.Poligono == poligono &&
                             p.ParcelaNumero == parcelaNum);
 
+                    // Si no existe, se crea
                     if (parcela == null)
                     {
                         parcela = new Parcelas
@@ -105,7 +120,9 @@ namespace TFG_Cultivos.Controllers
                         await _context.SaveChangesAsync();
                     }
 
+                    // -------------------------
                     // RECINTO
+                    // -------------------------
                     if (!row.Cell(9).TryGetValue<int>(out int recintoNum))
                     {
                         fila++;
@@ -117,6 +134,7 @@ namespace TFG_Cultivos.Controllers
                             r.ParcelaId == parcela.Id &&
                             r.IdRecinto == recintoNum);
 
+                    // Si no existe, se crea
                     if (recinto == null)
                     {
                         recinto = new Recintos
@@ -131,7 +149,9 @@ namespace TFG_Cultivos.Controllers
                         await _context.SaveChangesAsync();
                     }
 
-                    //DATOS AGRONÓMICOS(HISTÓRICO)
+                    // -------------------------
+                    // DATOS AGRONÓMICOS (HISTÓRICO)
+                    // -------------------------
                     bool existeDato = await _context.DatoAgronomico.AnyAsync(d =>
                          d.RecintoId == recinto.Id &&
                          d.AñoCampaña == añoCampaña);
@@ -155,7 +175,6 @@ namespace TFG_Cultivos.Controllers
                         _context.DatoAgronomico.Add(dato);
                     }
                 }
-
                 catch (Exception ex)
                 {
                     errores.Add($"Fila {fila}: {ex.Message}");
@@ -174,11 +193,13 @@ namespace TFG_Cultivos.Controllers
             });
         }
 
+        // --------------------------------------------------------------------
+        // Método auxiliar que detecta la hoja correcta del Excel PAC
+        // --------------------------------------------------------------------
         private IXLWorksheet? ObtenerHojaParcelas(XLWorkbook workbook)
         {
             foreach (var sheet in workbook.Worksheets)
             {
-                // Busca textos típicos PAC en las primeras filas
                 for (int fila = 1; fila <= 20; fila++)
                 {
                     var textoFila = sheet.Row(fila)
@@ -186,8 +207,7 @@ namespace TFG_Cultivos.Controllers
                         .Select(c => c.GetString().ToUpperInvariant())
                         .ToList();
 
-                    if (textoFila.Any(t => t.Contains("2.1 DATOS IDENTIFICATIVOS Y AGRONÓMICOS DE LAS PARCELAS"))
-                        )
+                    if (textoFila.Any(t => t.Contains("2.1 DATOS IDENTIFICATIVOS Y AGRONÓMICOS DE LAS PARCELAS")))
                     {
                         return sheet;
                     }
@@ -197,17 +217,23 @@ namespace TFG_Cultivos.Controllers
             return null;
         }
 
+        // --------------------------------------------------------------------
+        // POST api/farm/generar-propuesta-ia
+        // Llama a Gemini con los datos de la explotación y genera una propuesta
+        // de cultivos para la campaña seleccionada.
+        // --------------------------------------------------------------------
         [HttpPost("generar-propuesta-ia")]
         public async Task<IActionResult> GenerarPropuestaIa(GenerarPropuestaRequest elecciones)
         {
             string usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // Se usan los 3 años anteriores para el histórico
             int[] campanias = { elecciones.AnioCampania - 1, elecciones.AnioCampania - 2, elecciones.AnioCampania - 3 };
 
             if (elecciones.CultivosPermitidos == null || !elecciones.CultivosPermitidos.Any())
                 return BadRequest("Debe seleccionar al menos un cultivo permitido.");
 
-            // 1️ Cargar explotación
+            // 1. Cargar recintos del usuario
             var recintos = await _context.Recintos
                 .Include(r => r.Parcela)
                 .Include(r => r.DatosAgronomicos)
@@ -217,7 +243,7 @@ namespace TFG_Cultivos.Controllers
             if (!recintos.Any())
                 return BadRequest("El usuario no tiene recintos cargados.");
 
-            // 2️ Construir JSON para IA
+            // 2. Construir JSON para la IA
             var recintosIa = recintos.Select(r => new
             {
                 recintoId = r.Id,
@@ -249,9 +275,10 @@ namespace TFG_Cultivos.Controllers
                 },
                 recintos = recintosIa
             };
+
             string payloadJson = JsonSerializer.Serialize(payloadIa);
 
-            // 3️ Llamada única a Gemini
+            // 3. Llamada a Gemini
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(270);
             var request = new HttpRequestMessage(HttpMethod.Post, $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}");
@@ -267,30 +294,28 @@ namespace TFG_Cultivos.Controllers
             var requestBody = new
             {
                 contents = new[]
-    {
-        new
-        {
-            role = "user",
-            parts = new[]
-            {
-                new { text = $"INSTRUCCIONES CLAVE:\n{Constants.systemInstructions2}" },
-                new { text = $"DATOS DE LA EXPLOTACIÓN:\n{payloadJson}" }
-            }
-        }
-    },
+                {
+                    new
+                    {
+                        role = "user",
+                        parts = new[]
+                        {
+                            new { text = $"INSTRUCCIONES CLAVE:\n{Constants.systemInstructions2}" },
+                            new { text = $"DATOS DE LA EXPLOTACIÓN:\n{payloadJson}" }
+                        }
+                    }
+                },
                 generationConfig = new
                 {
                     temperature = 0.1
-
                 }
             };
-            // 2. Serializamos de forma que C# NO toque las minúsculas/mayúsculas
+
             var options = new JsonSerializerOptions { PropertyNamingPolicy = null };
             string finalJson = JsonSerializer.Serialize(requestBody, options);
 
-            var content = new StringContent(finalJson, Encoding.UTF8, "application/json");
+            request.Content = new StringContent(finalJson, Encoding.UTF8, "application/json");
 
-            request.Content = content;
             HttpResponseMessage response;
 
             try
@@ -307,9 +332,10 @@ namespace TFG_Cultivos.Controllers
             {
                 return StatusCode(500, $"Error llamando a IA: {ex.Message}");
             }
+
             var rawJson = await response.Content.ReadAsStringAsync();
 
-            // 4️ Procesar respuesta IA
+            // 4. Procesar respuesta de la IA
             PropuestaIaDto respuestaIa;
 
             try
@@ -329,11 +355,12 @@ namespace TFG_Cultivos.Controllers
                 return StatusCode(500, $"Error parseando IA: {ex.Message}");
             }
 
-            // 5️ Guardar BORRADOR
+            // 5. Guardar propuesta como borrador
             foreach (var r in respuestaIa.Asignaciones)
             {
                 if (!int.TryParse(r.ParcelaId, out int recintoId))
                     continue;
+
                 _context.PropuestasCultivo.Add(new PropuestaCultivo
                 {
                     UsuarioId = usuarioId,
@@ -361,6 +388,10 @@ namespace TFG_Cultivos.Controllers
             });
         }
 
+        // --------------------------------------------------------------------
+        // GET api/farm/exportar-propuesta
+        // Exporta a Excel la propuesta generada por la IA
+        // --------------------------------------------------------------------
         [HttpGet("exportar-propuesta")]
         public async Task<IActionResult> ExportarPropuestaExcel(int anio, bool soloBorrador = true)
         {
@@ -379,7 +410,7 @@ namespace TFG_Cultivos.Controllers
             using var workbook = new XLWorkbook();
             var ws = workbook.Worksheets.Add("Propuesta PAC");
 
-            // CABECERAS
+            // Cabeceras del Excel
             ws.Cell(1, 1).Value = "Municipio";
             ws.Cell(1, 2).Value = "Polígono";
             ws.Cell(1, 3).Value = "Parcela";
@@ -393,8 +424,7 @@ namespace TFG_Cultivos.Controllers
 
             foreach (var p in propuestas)
             {
-                // Limpieza de JSON
-                string justificacionLimpia= LimpiarJustificacion(p.Justificacion);
+                string justificacionLimpia = LimpiarJustificacion(p.Justificacion);
 
                 ws.Cell(fila, 1).Value = p.Recinto.Parcela.Municipio;
                 ws.Cell(fila, 2).Value = p.Recinto.Parcela.Poligono;
@@ -421,6 +451,10 @@ namespace TFG_Cultivos.Controllers
             );
         }
 
+        // --------------------------------------------------------------------
+        // GET api/farm/ver-en-sigpac
+        // Devuelve la URL para abrir una parcela directamente en el visor SIGPAC
+        // --------------------------------------------------------------------
         [HttpGet("ver-en-sigpac")]
         public async Task<IActionResult> VerEnSigpac(int id)
         {
@@ -448,6 +482,10 @@ namespace TFG_Cultivos.Controllers
             return Ok(new { visorUrl = urlFinal });
         }
 
+        // --------------------------------------------------------------------
+        // PUT api/farm/asignar-nombre
+        // Permite asignar un nombre personalizado a una parcela
+        // --------------------------------------------------------------------
         [HttpPut("asignar-nombre")]
         public async Task<IActionResult> AsignarNombreParcela(int parcelaId, string nombre)
         {
@@ -474,50 +512,120 @@ namespace TFG_Cultivos.Controllers
             });
         }
 
+        // --------------------------------------------------------------------
+        // GET api/farm/con-historico
+        // Devuelve todas las parcelas del usuario con sus recintos y el histórico
+        // de cultivos de cada recinto.
+        // --------------------------------------------------------------------
+        [HttpGet("con-historico")]
+        public async Task<IActionResult> GetParcelasConHistorico()
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var parcelas = await _context.Parcelas
+                .Where(p => p.UsuarioId == usuarioId)
+                .Include(p => p.Recintos)
+                    .ThenInclude(r => r.DatosAgronomicos)
+                .ToListAsync();
+
+            var result = parcelas.Select(p => new ParcelaDto
+            {
+                ParcelaId = p.Id,
+                Nombre = p.NombrePersonalizado,
+
+                Provincia = p.CodigoProvincia,
+                Municipio = p.Municipio,
+                Poligono = p.Poligono,
+                NumeroParcela = p.ParcelaNumero,
+
+                SuperficieTotal = p.Recintos.Sum(r => r.SuperficieSigpac),
+
+                Recintos = p.Recintos.Select(r => new RecintoDto
+                {
+                    RecintoId = r.Id,
+                    Superficie  = r.SuperficieSigpac,
+
+                    Historico = r.DatosAgronomicos
+                        .OrderByDescending(d => d.AñoCampaña)
+                        .Select(d => new HistoricoCultivoDto
+                        {
+                            AnioCampania = d.AñoCampaña,
+                            Cultivo = d.EspecieVariedad
+                        })
+                        .ToList()
+                }).ToList()
+            });
+
+            return Ok(result);
+        }
+
+        // --------------------------------------------------------------------
+        // GET api/farm/cultivos
+        // Devuelve una lista fija de cultivos disponibles en la aplicación.
+        // Esta lista se utiliza para mostrar opciones al usuario en el frontend
+        // cuando debe seleccionar cultivos permitidos o asignar cultivos a recintos.
+        // --------------------------------------------------------------------
         [HttpGet("cultivos")]
         public IActionResult GetCultivos()
         {
             var cultivos = new List<string>
-                {
-                    "Trigo blando",
-                    "Trigo duro",
-                    "Cebada",
-                    "Avena",
-                    "Centeno",
-                    "Triticale",
-                    "Maíz",
-                    "Girasol",
-                    "Colza",
-                    "Barbecho",
-                    "Pastos permanentes",
-                    "Lentejas",
-                    "Guisantes",
-                    "Garbanzos",
-                    "Veza",
-                    "Yeros",
-                    "Patata",
-                    "Remolacha azucarera",
-                    "Alfalfa"
-                };
+        {
+            "Trigo blando",
+            "Trigo duro",
+            "Cebada",
+            "Avena",
+            "Centeno",
+            "Triticale",
+            "Maíz",
+            "Girasol",
+            "Colza",
+            "Barbecho",
+            "Pastos permanentes",
+            "Lentejas",
+            "Guisantes",
+            "Garbanzos",
+            "Veza",
+            "Yeros",
+            "Patata",
+            "Remolacha azucarera",
+            "Alfalfa"
+        };
 
             return Ok(cultivos);
         }
 
+        // --------------------------------------------------------------------
+        // GET api/farm/ecorregimenes
+        // Devuelve una lista fija de ecorregímenes disponibles.
+        // Se usa para que el usuario pueda seleccionar qué prácticas PAC
+        // quiere solicitar en la campaña objetivo.
+        // --------------------------------------------------------------------
         [HttpGet("ecorregimenes")]
         public IActionResult GetEcorregimenes()
         {
             var ecorregimenes = new List<string>
-                {
-                    "BCAM-7 DIVERSIFICACION DE CULTIVOS",
-                    "BCAM-7 ROTACIÓN DE CULTIVOS",
-                    "P3: PRÁCTICA DE ROTACIÓN DE CULTIVOS CON ESPECIES MEJORANTES",
-                    "P4: PRÁCTICA DE LA SIEMBRA DIRECTA"
-                };
+        {
+            "BCAM-7 DIVERSIFICACION DE CULTIVOS",
+            "BCAM-7 ROTACIÓN DE CULTIVOS",
+            "P3: PRÁCTICA DE ROTACIÓN DE CULTIVOS CON ESPECIES MEJORANTES",
+            "P4: PRÁCTICA DE LA SIEMBRA DIRECTA"
+        };
 
             return Ok(ecorregimenes);
         }
 
-
+        // --------------------------------------------------------------------
+        // Método auxiliar: LimpiarJustificacion
+        // Este método recibe la justificación almacenada en la base de datos,
+        // que puede venir en distintos formatos (string JSON, objeto JSON, etc.).
+        //
+        // Su objetivo es devolver un texto limpio y legible para exportarlo a Excel.
+        //
+        // Casos contemplados:
+        //  - Si es un string JSON (entre comillas), se deserializa y se devuelve.
+        //  - Si es un objeto JSON, se extraen sus valores y se unen con " | ".
+        //  - Si no se puede procesar, se devuelve el texto original.
+        // --------------------------------------------------------------------
         private static string LimpiarJustificacion(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw))
@@ -525,14 +633,16 @@ namespace TFG_Cultivos.Controllers
 
             try
             {
-                // Caso A: string JSON
+                // Caso A: el contenido es un string JSON (empieza con comillas)
                 if (raw.TrimStart().StartsWith("\""))
                     return JsonSerializer.Deserialize<string>(raw);
 
-                // Caso B: objeto JSON
+                // Caso B: el contenido es un objeto JSON
                 if (raw.TrimStart().StartsWith("{"))
                 {
                     using var doc = JsonDocument.Parse(raw);
+
+                    // Se concatenan los valores del objeto JSON en una sola línea
                     return string.Join(" | ",
                         doc.RootElement.EnumerateObject()
                             .Select(p => p.Value.GetString())
@@ -542,8 +652,11 @@ namespace TFG_Cultivos.Controllers
             }
             catch
             {
+                // Si algo falla, se devuelve el texto tal cual
             }
+
             return raw;
         }
+
     }
 }

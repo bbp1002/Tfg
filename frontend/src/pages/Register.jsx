@@ -28,10 +28,10 @@ export default function Register() {
   };
 
   return (
-    <div>
+    <div style={centerBox}>
       <h2>Registro</h2>
 
-      <div style={{ marginTop: "20px" }}>
+      <div style={{ marginTop: "20px" , color: "black"}}>
         <label>Nombre:</label>
         <input
           type="text"
@@ -40,7 +40,7 @@ export default function Register() {
         />
       </div>
 
-      <div style={{ marginTop: "20px" }}>
+      <div style={{ marginTop: "20px" , color: "black"}}>
         <label>Email:</label>
         <input
           type="email"
@@ -49,7 +49,7 @@ export default function Register() {
         />
       </div>
 
-      <div style={{ marginTop: "20px" }}>
+      <div style={{ marginTop: "20px" , color: "black"}}>
         <label>Contraseña:</label>
         <input
           type="password"
@@ -76,3 +76,13 @@ export default function Register() {
     </div>
   );
 }
+const centerBox = {
+  maxWidth: "400px",
+  margin: "80px auto",
+  padding: "30px",
+  background: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+  textAlign: "center",
+  color: "black"
+};
