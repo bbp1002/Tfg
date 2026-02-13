@@ -21,6 +21,15 @@ El proyecto nace a partir de una necesidad real detectada en el entorno familiar
 
 ---
 
+## Acceso a la aplicación
+
+La aplicación está desplegada y disponible en la siguiente URL:
+
+ **[https://d2h5scx071fgvu.cloudfront.net/]**
+
+
+---
+
 ## Tecnologías utilizadas
 
 **Backend**
@@ -83,3 +92,10 @@ El proyecto nace a partir de una necesidad real detectada en el entorno familiar
 ---
 
 Proyecto desarrollado como Trabajo de Fin de Grado con fines académicos.
+---
+
+## Licencia
+
+Este proyecto está distribuido bajo la licencia **GNU General Public License v3.0 (GPLv3)**.  
+Puedes consultar el texto completo en el archivo [`LICENSE`](./LICENSE).
+
