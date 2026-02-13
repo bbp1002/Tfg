@@ -14,7 +14,7 @@ function Layout() {
   const location = useLocation();
 
   // Rutas donde NO queremos cabecera ni navbar
-  const rutasSinLayout = ["/login", "/register"];
+  const rutasSinLayout = ["/", "/register"];
   const ocultarLayout = rutasSinLayout.includes(location.pathname);
 
   return (
@@ -54,14 +54,14 @@ function Layout() {
         }}
       >
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/importar-pac" element={<ImportarPac />} />
           <Route path="/generar-propuesta" element={<GenerarPropuesta />} />
           <Route path="/exportar-propuesta" element={<ExportarPropuesta />} />
           <Route path="/ver-en-sigpac" element={<VerEnSigpac />} />
           <Route path="/asignar-nombre" element={<AsignarNombre />} />
-          <Route path="/" element={<ParcelasConHistorico />} />
+          <Route path="/home" element={<ParcelasConHistorico />} />
         </Routes>
       </div>
     </>

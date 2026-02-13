@@ -21,7 +21,7 @@ export default function Navbar() {
         padding: "15px 20px" 
       }}
     >
-      <Link style={linkStyle} to="/">Home</Link>
+      <Link style={linkStyle} to="/home">Home</Link>
       <Link style={linkStyle} to="/importar-pac">Importar PAC</Link>
       <Link style={linkStyle} to="/generar-propuesta">Propuesta IA</Link>
       <Link style={linkStyle} to="/exportar-propuesta">Exportar</Link>

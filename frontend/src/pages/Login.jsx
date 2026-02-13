@@ -14,7 +14,7 @@ export default function Login() {
       const res = await login({ email, password });
       localStorage.setItem("jwt", res.data.token);
 
-      navigate("/"); // Redirige a Home
+      navigate("/home"); // Redirige a Home
 
     } catch {
       alert("Error en login");
