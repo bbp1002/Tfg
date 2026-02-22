@@ -21,7 +21,7 @@ export default function ImportarPac() {
   };
 
   return (
-    <div>
+    <div style={centerBox}>
       <h2>Importar PAC</h2>
 
       <label>Año de campaña</label>
@@ -42,3 +42,14 @@ export default function ImportarPac() {
     </div>
   );
 }
+
+const centerBox = {
+  maxWidth: "400px",
+  margin: "80px auto",
+  padding: "30px",
+  background: "white",
+  borderRadius: "12px",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+  textAlign: "center",
+  color: "black"
+};
